@@ -54,7 +54,7 @@ public class EEducationPlatformDomainSharedModule : AbpModule
 
         Configure<AbpExceptionLocalizationOptions>(options =>
         {
-            options.MapCodeNamespace("EEducationPlatform", typeof(EEducationPlatformResource));
+            options.MapCodeNamespace("EDU", typeof(EEducationPlatformResource));
         });
     }
 }

@@ -25,11 +25,13 @@ public class EEducationPlatformDbContext :
     ITenantManagementDbContext,
     IIdentityDbContext
 {
+    #region Entities from EEducationPlatform
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
 
-
+    
+    #endregion
+    
     #region Entities from the modules
-
     /* Notice: We only implemented IIdentityProDbContext and ISaasDbContext
      * and replaced them for this DbContext. This allows you to perform JOIN
      * queries for the entities of these modules over the repositories easily. You
@@ -57,8 +59,7 @@ public class EEducationPlatformDbContext :
 
     #endregion
 
-    public EEducationPlatformDbContext(DbContextOptions<EEducationPlatformDbContext> options)
-        : base(options)
+    public EEducationPlatformDbContext(DbContextOptions<EEducationPlatformDbContext> options) : base(options)
     {
 
     }
@@ -68,7 +69,6 @@ public class EEducationPlatformDbContext :
         base.OnModelCreating(builder);
 
         /* Include modules to your migration db context */
-
         builder.ConfigurePermissionManagement();
         builder.ConfigureSettingManagement();
         builder.ConfigureBackgroundJobs();
@@ -78,14 +78,7 @@ public class EEducationPlatformDbContext :
         builder.ConfigureOpenIddict();
         builder.ConfigureTenantManagement();
         builder.ConfigureBlobStoring();
-        
-        /* Configure your own tables/entities inside here */
 
-        //builder.Entity<YourEntity>(b =>
-        //{
-        //    b.ToTable(EEducationPlatformConsts.DbTablePrefix + "YourEntities", EEducationPlatformConsts.DbSchema);
-        //    b.ConfigureByConvention(); //auto configure for the base class props
-        //    //...
-        //});
+        builder.ConfigureEEducationPlatformEntities();
     }
 }
