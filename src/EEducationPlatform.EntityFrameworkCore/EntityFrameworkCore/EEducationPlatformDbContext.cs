@@ -1,3 +1,6 @@
+using EEducationPlatform.Aggregates.Categories;
+using EEducationPlatform.Aggregates.Courses;
+using EEducationPlatform.Aggregates.LookupTypes;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -5,7 +8,6 @@ using Volo.Abp.BlobStoring.Database.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore;
-using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.EntityFrameworkCore;
@@ -26,8 +28,19 @@ public class EEducationPlatformDbContext :
     IIdentityDbContext
 {
     #region Entities from EEducationPlatform
+    
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
-
+    
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<Course> Courses { get; set; }
+    public DbSet<CourseInstructor> CourseInstructors { get; set; }
+    public DbSet<CourseAdmin> CourseAdmins { get; set; }
+    public DbSet<CourseStudent> CourseStudents { get; set; }
+    public DbSet<CourseCategory> CourseCategories { get; set; }
+    public DbSet<CourseLecture> CourseLectures { get; set; }
+    public DbSet<CourseDocument> CourseDocuments { get; set; }
+    public DbSet<LookupType> LookupTypes { get; set; }
+    public DbSet<LookupValue> LookupValues { get; set; }
     
     #endregion
     

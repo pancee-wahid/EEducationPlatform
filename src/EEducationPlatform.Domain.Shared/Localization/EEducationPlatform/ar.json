@@ -1,6 +1,8 @@
 {
   "culture": "ar",
   "texts": {
+    "EDU:000001": "لا يمكن العثور على كيان {EntityName} بالرقم التعريفي {Id} ليتم تعديله",
+    
     "AppName": "EEducationPlatform",
     "Menu:Home": "منزل، بيت",
     "Menu:ContactUs": "اتصل بنا",

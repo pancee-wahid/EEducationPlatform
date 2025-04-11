@@ -1,6 +1,8 @@
 {
   "Culture": "en",
   "Texts": {
+    "EDU:000001": "{EntityName} with id {Id} can't be found to be updated",
+    
     "AppName": "EEducationPlatform",
     "Menu:Home": "Home",
     "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information visit",
