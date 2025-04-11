@@ -1,0 +1,101 @@
+{
+  "template": "app",
+  "imports": {
+    "Volo.Abp.LeptonXLiteTheme": {
+      "version": "4.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.Account": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.OpenIddict": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.Identity": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.TenantManagement": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.PermissionManagement": {
+      "version": "9.1.0",
+      "isInstalled": true
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "9.1.0",
+      "isInstalled": true
+    }
+  },
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "EEducationPlatform.Application": {
+      "path": "src/EEducationPlatform.Application/EEducationPlatform.Application.abppkg",
+      "folder": "src"
+    },
+    "EEducationPlatform.Application.Tests": {
+      "path": "test/EEducationPlatform.Application.Tests/EEducationPlatform.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "EEducationPlatform.Domain.Shared": {
+      "path": "src/EEducationPlatform.Domain.Shared/EEducationPlatform.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "EEducationPlatform.Application.Contracts": {
+      "path": "src/EEducationPlatform.Application.Contracts/EEducationPlatform.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "EEducationPlatform.HttpApi": {
+      "path": "src/EEducationPlatform.HttpApi/EEducationPlatform.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "EEducationPlatform.HttpApi.Client": {
+      "path": "src/EEducationPlatform.HttpApi.Client/EEducationPlatform.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "EEducationPlatform.EntityFrameworkCore.Tests": {
+      "path": "test/EEducationPlatform.EntityFrameworkCore.Tests/EEducationPlatform.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "EEducationPlatform.EntityFrameworkCore": {
+      "path": "src/EEducationPlatform.EntityFrameworkCore/EEducationPlatform.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "EEducationPlatform.TestBase": {
+      "path": "test/EEducationPlatform.TestBase/EEducationPlatform.TestBase.abppkg",
+      "folder": "test"
+    },
+    "EEducationPlatform.Domain.Tests": {
+      "path": "test/EEducationPlatform.Domain.Tests/EEducationPlatform.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "EEducationPlatform.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/EEducationPlatform.HttpApi.Client.ConsoleTestApp/EEducationPlatform.HttpApi.Client.ConsoleTestApp.abppkg",
+      "folder": "test"
+    },
+    "EEducationPlatform.DbMigrator": {
+      "path": "src/EEducationPlatform.DbMigrator/EEducationPlatform.DbMigrator.abppkg",
+      "folder": "src"
+    },
+    "EEducationPlatform.HttpApi.Host": {
+      "path": "src/EEducationPlatform.HttpApi.Host/EEducationPlatform.HttpApi.Host.abppkg",
+      "folder": "src"
+    },
+    "EEducationPlatform.Domain": {
+      "path": "src/EEducationPlatform.Domain/EEducationPlatform.Domain.abppkg",
+      "folder": "src"
+    }
+  }
+}
