@@ -3,7 +3,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace EEducationPlatform.Aggregates.Courses;
 
-public class CourseLecture : FullAuditedEntity<Guid>
+public class Lecture : FullAuditedEntity<Guid>
 {
     public string Name { get; private set; }
     public string? Description { get; private set; }
@@ -12,7 +12,7 @@ public class CourseLecture : FullAuditedEntity<Guid>
     public DateTime? PublishDate { get; private set; }
     public string? YoutubeLink { get; private set; }
 
-    public CourseLecture(Guid id, string name, string? description, Guid courseId, int? length, DateTime? publishDate,
+    public Lecture(Guid id, string name, string? description, Guid courseId, int? length, DateTime? publishDate,
         string? youtubeLink) : base(id)
     {
         Name = name;
@@ -23,7 +23,7 @@ public class CourseLecture : FullAuditedEntity<Guid>
         YoutubeLink = youtubeLink;
     }
 
-    public CourseLecture Update(string name, string? description, int? length, DateTime? publishDate,
+    public Lecture Update(string name, string? description, int? length, DateTime? publishDate,
         string? youtubeLink)
     {
         Name = name;

@@ -6,13 +6,13 @@ using static EEducationPlatform.EEducationPlatformConstants.Validations;
 
 namespace EEducationPlatform.EntityFrameworkCore.EntityConfigurations;
 
-public class CourseLectureConfiguration : IEntityTypeConfiguration<CourseLecture>
+public class LectureConfiguration : IEntityTypeConfiguration<Lecture>
 {
-    public void Configure(EntityTypeBuilder<CourseLecture> builder)
+    public void Configure(EntityTypeBuilder<Lecture> builder)
     {
         builder.ConfigureByConvention();
 
-        builder.ToTable(nameof(CourseLecture));
+        builder.ToTable(nameof(Lecture));
 
         #region Properies configuration
 

@@ -3,7 +3,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace EEducationPlatform.Aggregates.Courses;
 
-public class CourseDocument : FullAuditedEntity<Guid>
+public class Document : FullAuditedEntity<Guid>
 {
     public string Name { get; private set; }
     public DocumentType Type { get; private set; }
@@ -13,7 +13,7 @@ public class CourseDocument : FullAuditedEntity<Guid>
     public int Size { get; private set; } // in KBs
     public int PagesCount { get; private set; }
 
-    public CourseDocument(Guid id, string name, DocumentType type, Guid courseId, Guid? lectureId, string path,
+    public Document(Guid id, string name, DocumentType type, Guid courseId, Guid? lectureId, string path,
         int size, int pagesCount) : base(id)
     {
         Name = name;

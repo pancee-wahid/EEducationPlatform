@@ -31,16 +31,21 @@ public class EEducationPlatformDbContext :
     
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
     
-    public DbSet<Category> Categories { get; set; }
-    public DbSet<Course> Courses { get; set; }
-    public DbSet<CourseInstructor> CourseInstructors { get; set; }
-    public DbSet<CourseAdmin> CourseAdmins { get; set; }
-    public DbSet<CourseStudent> CourseStudents { get; set; }
-    public DbSet<CourseCategory> CourseCategories { get; set; }
-    public DbSet<CourseLecture> CourseLectures { get; set; }
-    public DbSet<CourseDocument> CourseDocuments { get; set; }
     public DbSet<LookupType> LookupTypes { get; set; }
     public DbSet<LookupValue> LookupValues { get; set; }
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<Course> Courses { get; set; }
+    public DbSet<Instructor> Instructors { get; set; }
+    public DbSet<Admin> Admins { get; set; }
+    public DbSet<Student> Students { get; set; }
+    public DbSet<CourseCategory> CourseCategories { get; set; }
+    public DbSet<Lecture> Lectures { get; set; }
+    public DbSet<Document> Documents { get; set; }
+    public DbSet<Exam> Exams { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<Choice> Choices { get; set; }
+    public DbSet<Submission> Submissions { get; set; }
+    public DbSet<StudentAnswer> StudentAnswers { get; set; }
     
     #endregion
     

@@ -28,3 +28,19 @@ public enum DocumentType : long
     Revision = 305,
     SampleExams = 306
 }
+
+public enum ExamType : long
+{
+    Other = 400,
+    LectureQuiz = 401,
+    CourseQuiz = 402,
+    MidExam = 403,
+    FinalExam = 404
+}
+
+public enum QuestionType : long
+{
+    Other = 500,
+    MCQ = 501,
+    Essay = 502
+}

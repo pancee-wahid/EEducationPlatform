@@ -2,36 +2,34 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Volo.Abp.EntityFrameworkCore.Modeling;
-using Volo.Abp.Identity;
 using static EEducationPlatform.EEducationPlatformConstants.Validations;
 
 namespace EEducationPlatform.EntityFrameworkCore.EntityConfigurations;
 
-public class CourseAdminConfiguration : IEntityTypeConfiguration<CourseAdmin>
+public class StudentAnswerConfiguration : IEntityTypeConfiguration<StudentAnswer>
 {
-    public void Configure(EntityTypeBuilder<CourseAdmin> builder)
+    public void Configure(EntityTypeBuilder<StudentAnswer> builder)
     {
         builder.ConfigureByConvention();
 
-        builder.ToTable(nameof(CourseAdmin));
+        builder.ToTable(nameof(StudentAnswer));
 
         #region Properies configuration
 
-        builder.Property(x => x.Experience).HasMaxLength(StringLength.Description);
-        builder.Property(x => x.Bio).HasMaxLength(StringLength.Description);
+        builder.Property(x => x.Answer).HasMaxLength(StringLength.Description);
 
         #endregion
 
         #region Keys configuration
 
-        builder.HasOne<Course>()
-            .WithMany(course => course.Admins)
-            .HasForeignKey(courseAdmin => courseAdmin.CourseId)
+        builder.HasOne<Submission>()
+            .WithMany(submission => submission.Answers)
+            .HasForeignKey(studentAnswer => studentAnswer.SubmissionId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne<IdentityUser>()
+        
+        builder.HasOne<Question>()
             .WithMany()
-            .HasForeignKey(courseAdmin => courseAdmin.UserId)
+            .HasForeignKey(studentAnswer => studentAnswer.QuestionId)
             .OnDelete(DeleteBehavior.Restrict);
 
         #endregion

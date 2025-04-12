@@ -19,23 +19,24 @@ public class Course : FullAuditedAggregateRoot<Guid>
     private readonly List<CourseCategory> _categories;
     public IEnumerable<CourseCategory> Categories => _categories.AsReadOnly();
 
-    private readonly List<CourseInstructor> _instructors;
-    public IEnumerable<CourseInstructor> Instructors => _instructors.AsReadOnly();
+    private readonly List<Instructor> _instructors;
+    public IEnumerable<Instructor> Instructors => _instructors.AsReadOnly();
 
-    private readonly List<CourseAdmin> _admins;
-    public IEnumerable<CourseAdmin> Admins => _admins.AsReadOnly();
+    private readonly List<Admin> _admins;
+    public IEnumerable<Admin> Admins => _admins.AsReadOnly();
 
-    private readonly List<CourseStudent> _students;
-    public IEnumerable<CourseStudent> Students => _students.AsReadOnly();
+    private readonly List<Student> _students;
+    public IEnumerable<Student> Students => _students.AsReadOnly();
 
-    private readonly List<CourseLecture> _lectures;
-    public IEnumerable<CourseLecture> Lectures => _lectures.AsReadOnly();
+    private readonly List<Lecture> _lectures;
+    public IEnumerable<Lecture> Lectures => _lectures.AsReadOnly();
 
-    private readonly List<CourseDocument> _documents;
-    public IEnumerable<CourseDocument> Documents => _documents.AsReadOnly();
-
-    // List of Exams
-
+    private readonly List<Document> _documents;
+    public IEnumerable<Document> Documents => _documents.AsReadOnly();
+    
+    private readonly List<Exam> _exams;
+    public IEnumerable<Exam> Exams => _exams.AsReadOnly();
+    
     public Course(Guid id, string name, string code, string? description, bool isPaid,
         float? subscriptionFees) : base(id)
     {
@@ -50,6 +51,7 @@ public class Course : FullAuditedAggregateRoot<Guid>
         _students = [];
         _lectures = [];
         _documents = [];
+        _exams = [];
     }
 
     #region Course category
@@ -72,9 +74,9 @@ public class Course : FullAuditedAggregateRoot<Guid>
 
     #region Course instructor
 
-    public void AddCourseInstructor(Guid id, Guid userId, Guid courseId, string? experience, string? bio)
+    public void AddInstructor(Guid id, Guid userId, Guid courseId, string? experience, string? bio)
     {
-        _instructors.Add(new CourseInstructor(
+        _instructors.Add(new Instructor(
             id: id,
             userId: userId,
             courseId: courseId,
@@ -83,31 +85,31 @@ public class Course : FullAuditedAggregateRoot<Guid>
         ));
     }
 
-    public void UpdateCourseInstructor(CourseInstructor updatedCourseInstructor)
+    public void UpdateInstructor(Instructor updatedInstructor)
     {
-        var courseLecturer = _instructors.Find(l => l.Id == updatedCourseInstructor.Id)
+        var courseLecturer = _instructors.Find(l => l.Id == updatedInstructor.Id)
                              ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
-                                 .WithData("EntityName", nameof(CourseInstructor))
-                                 .WithData("Id", updatedCourseInstructor.Id.ToString());
+                                 .WithData("EntityName", nameof(Instructor))
+                                 .WithData("Id", updatedInstructor.Id.ToString());
 
         courseLecturer.Update(
-            experience: updatedCourseInstructor.Experience,
-            bio: updatedCourseInstructor.Bio
+            experience: updatedInstructor.Experience,
+            bio: updatedInstructor.Bio
         );
     }
 
-    public void RemoveCourseInstructors(IEnumerable<CourseInstructor> courseInstructors)
+    public void RemoveInstructors(IEnumerable<Instructor> instructors)
     {
-        _instructors.RemoveAll(courseInstructors);
+        _instructors.RemoveAll(instructors);
     }
 
     #endregion
 
     #region Course admin
 
-    public void AddCourseAdmin(Guid id, Guid userId, Guid courseId, string? experience, string? bio)
+    public void AddAdmin(Guid id, Guid userId, Guid courseId, string? experience, string? bio)
     {
-        _admins.Add(new CourseAdmin(
+        _admins.Add(new Admin(
             id: id,
             userId: userId,
             courseId: courseId,
@@ -116,31 +118,31 @@ public class Course : FullAuditedAggregateRoot<Guid>
         ));
     }
 
-    public void UpdateCourseAdmin(CourseAdmin updatedCourseAdmin)
+    public void UpdateAdmin(Admin updatedAdmin)
     {
-        var courseAdmin = _admins.Find(l => l.Id == updatedCourseAdmin.Id)
+        var admin = _admins.Find(l => l.Id == updatedAdmin.Id)
                           ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
-                              .WithData("EntityName", nameof(CourseAdmin))
-                              .WithData("Id", updatedCourseAdmin.Id.ToString());
+                              .WithData("EntityName", nameof(Admin))
+                              .WithData("Id", updatedAdmin.Id.ToString());
 
-        courseAdmin.Update(
-            experience: updatedCourseAdmin.Experience,
-            bio: updatedCourseAdmin.Bio
+        admin.Update(
+            experience: updatedAdmin.Experience,
+            bio: updatedAdmin.Bio
         );
     }
 
-    public void RemoveCourseAdmins(IEnumerable<CourseAdmin> courseAdmins)
+    public void RemoveAdmins(IEnumerable<Admin> admins)
     {
-        _admins.RemoveAll(courseAdmins);
+        _admins.RemoveAll(admins);
     }
 
     #endregion
 
     #region Course student
 
-    public void AddCourseStudent(Guid id, Guid userId, Guid courseId, DateTime enrollmentDate, float score)
+    public void AddStudent(Guid id, Guid userId, Guid courseId, DateTime enrollmentDate, float score)
     {
-        _students.Add(new CourseStudent(
+        _students.Add(new Student(
             id: id,
             userId: userId,
             courseId: courseId,
@@ -149,26 +151,26 @@ public class Course : FullAuditedAggregateRoot<Guid>
         ));
     }
 
-    public void UpdateCourseStudent(CourseStudent updatedCourseStudent)
+    public void UpdateStudent(Student updatedStudent)
     {
-        var courseStudent = _students.Find(l => l.Id == updatedCourseStudent.Id)
+        var student = _students.Find(l => l.Id == updatedStudent.Id)
                             ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
-                                .WithData("EntityName", nameof(CourseStudent))
-                                .WithData("Id", updatedCourseStudent.Id.ToString());
+                                .WithData("EntityName", nameof(Student))
+                                .WithData("Id", updatedStudent.Id.ToString());
 
-        courseStudent.Update(score: updatedCourseStudent.Score);
+        student.Update(score: updatedStudent.Score);
     }
 
-    public void RemoveCourseStudents(IEnumerable<CourseStudent> courseStudents)
+    public void RemoveStudents(IEnumerable<Student> students)
     {
-        _students.RemoveAll(courseStudents);
+        _students.RemoveAll(students);
     }
 
     #endregion
 
     #region Course lecture
 
-    public void AddCourseLecture(Guid id, string name, string? description, int? length, DateTime? publishDate,
+    public void AddLecture(Guid id, string name, string? description, int? length, DateTime? publishDate,
         string? youtubeLink)
     {
         _lectures.Add(new(id: id,
@@ -181,34 +183,34 @@ public class Course : FullAuditedAggregateRoot<Guid>
         ));
     }
 
-    public void UpdateCourseLecture(CourseLecture updatedCourseLecture)
+    public void UpdateLecture(Lecture updatedLecture)
     {
-        var courseLecture = _lectures.Find(l => l.Id == updatedCourseLecture.Id)
+        var courseLecture = _lectures.Find(l => l.Id == updatedLecture.Id)
                             ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
-                                .WithData("EntityName", nameof(CourseLecture))
-                                .WithData("Id", updatedCourseLecture.Id.ToString());
+                                .WithData("EntityName", nameof(Lecture))
+                                .WithData("Id", updatedLecture.Id.ToString());
 
         courseLecture.Update(
-            name: updatedCourseLecture.Name,
-            description: updatedCourseLecture.Description,
-            length: updatedCourseLecture.Length,
-            publishDate: updatedCourseLecture.PublishDate,
-            youtubeLink: updatedCourseLecture.YoutubeLink);
+            name: updatedLecture.Name,
+            description: updatedLecture.Description,
+            length: updatedLecture.Length,
+            publishDate: updatedLecture.PublishDate,
+            youtubeLink: updatedLecture.YoutubeLink);
     }
 
-    public void RemoveCourseLectures(IEnumerable<CourseLecture> courseLectures)
+    public void RemoveLectures(IEnumerable<Lecture> lectures)
     {
-        _lectures.RemoveAll(courseLectures);
+        _lectures.RemoveAll(lectures);
     }
 
     #endregion
 
     #region Course document
 
-    public void AddCourseDocument(Guid id, string name, DocumentType type, Guid lectureId, string path, int size,
+    public void AddDocument(Guid id, string name, DocumentType type, Guid lectureId, string path, int size,
         int pagesCount)
     {
-        _documents.Add(new CourseDocument(
+        _documents.Add(new Document(
             id: id,
             name: name,
             type: type,
@@ -220,9 +222,46 @@ public class Course : FullAuditedAggregateRoot<Guid>
         ));
     }
 
-    public void RemoveCourseDocuments(IEnumerable<CourseDocument> courseDocuments)
+    public void RemoveDocuments(IEnumerable<Document> documents)
     {
-        _documents.RemoveAll(courseDocuments);
+        _documents.RemoveAll(documents);
+    }
+
+    #endregion
+    
+    #region Course exam
+
+    public void AddExam(Guid id, string name, string? description, Guid? lectureId, ExamType type, float score)
+    {
+        _exams.Add(new Exam(
+            id: id,
+            name: name, 
+            description: description,  
+            courseId: this.Id, 
+            lectureId: lectureId,
+            type: type,
+            score: score
+        ));
+    }
+
+    public void UpdateExam(Exam updatedExam)
+    {
+        var exam = _exams.Find(l => l.Id == updatedExam.Id)
+                             ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
+                                 .WithData("EntityName", nameof(Exam))
+                                 .WithData("Id", updatedExam.Id.ToString());
+
+        exam.Update(
+            name: updatedExam.Name,
+            description: updatedExam.Description,
+            type: updatedExam.Type,
+            score: updatedExam.Score
+        );
+    }
+
+    public void RemoveExams(IEnumerable<Exam> exams)
+    {
+        _exams.RemoveAll(exams);
     }
 
     #endregion

@@ -7,13 +7,13 @@ using static EEducationPlatform.EEducationPlatformConstants.Validations;
 
 namespace EEducationPlatform.EntityFrameworkCore.EntityConfigurations;
 
-public class CourseInstructorConfiguration : IEntityTypeConfiguration<CourseInstructor>
+public class InstructorConfiguration : IEntityTypeConfiguration<Instructor>
 {
-    public void Configure(EntityTypeBuilder<CourseInstructor> builder)
+    public void Configure(EntityTypeBuilder<Instructor> builder)
     {
         builder.ConfigureByConvention();
 
-        builder.ToTable(nameof(CourseInstructor));
+        builder.ToTable(nameof(Instructor));
 
         #region Properies configuration
 

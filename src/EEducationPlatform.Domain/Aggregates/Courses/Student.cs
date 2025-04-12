@@ -3,14 +3,14 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace EEducationPlatform.Aggregates.Courses;
 
-public class CourseStudent : FullAuditedEntity<Guid>
+public class Student : FullAuditedEntity<Guid>
 {
     public Guid UserId { get; private set; }
     public Guid CourseId { get; private set; }
     public DateTime EnrollmentDate { get; private set; }
-    public float Score { get; private set; }
+    public float Score { get; private set; } // calculated across all exams - may be deleted
 
-    public CourseStudent(Guid id, Guid userId, Guid courseId, DateTime enrollmentDate, float score) : base(id)
+    public Student(Guid id, Guid userId, Guid courseId, DateTime enrollmentDate, float score) : base(id)
     {
         UserId = userId;
         CourseId = courseId;
@@ -18,7 +18,7 @@ public class CourseStudent : FullAuditedEntity<Guid>
         Score = score;
     }
 
-    public CourseStudent Update(float score)
+    public Student Update(float score)
     {
         Score = score;
 

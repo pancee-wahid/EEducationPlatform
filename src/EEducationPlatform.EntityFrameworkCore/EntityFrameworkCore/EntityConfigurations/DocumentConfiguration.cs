@@ -8,13 +8,13 @@ using static EEducationPlatform.EEducationPlatformConstants.Validations;
 
 namespace EEducationPlatform.EntityFrameworkCore.EntityConfigurations;
 
-public class CourseDocumentConfiguration : IEntityTypeConfiguration<CourseDocument>
+public class DocumentConfiguration : IEntityTypeConfiguration<Document>
 {
-    public void Configure(EntityTypeBuilder<CourseDocument> builder)
+    public void Configure(EntityTypeBuilder<Document> builder)
     {
         builder.ConfigureByConvention();
 
-        builder.ToTable(nameof(CourseDocument));
+        builder.ToTable(nameof(Document));
 
         #region Properies configuration
 
@@ -30,7 +30,7 @@ public class CourseDocumentConfiguration : IEntityTypeConfiguration<CourseDocume
             .HasForeignKey(courseDocument => courseDocument.CourseId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<CourseLecture>()
+        builder.HasOne<Lecture>()
             .WithMany()
             .HasForeignKey(courseDocument => courseDocument.LectureId)
             .OnDelete(DeleteBehavior.Restrict);
