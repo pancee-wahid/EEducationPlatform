@@ -4,6 +4,7 @@ using EEducationPlatform.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace EEducationPlatform.Migrations
 {
     [DbContext(typeof(EEducationPlatformDbContext))]
-    partial class EEducationPlatformDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250413094213_Added_Exams_Tables")]
+    partial class Added_Exams_Tables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,6 +101,63 @@ namespace EEducationPlatform.Migrations
                     b.ToTable("Category", (string)null);
                 });
 
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Choice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<bool>("IsCorrectAnswer")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("varchar(1)");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("Choice", (string)null);
+                });
+
             modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Course", b =>
                 {
                     b.Property<Guid>("Id")
@@ -169,8 +229,8 @@ namespace EEducationPlatform.Migrations
 
                     b.ToTable("Course", (string)null);
                 });
-            
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Admin", b =>
+
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.CourseAdmin", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
@@ -225,64 +285,7 @@ namespace EEducationPlatform.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Admin", (string)null);
-                });
-
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Choice", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<Guid?>("DeleterId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("DeleterId");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("DeletionTime");
-
-                    b.Property<bool>("IsCorrectAnswer")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false)
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasColumnType("varchar(1)");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<Guid>("QuestionId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("Choice", (string)null);
+                    b.ToTable("CourseAdmin", (string)null);
                 });
 
             modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.CourseCategory", b =>
@@ -321,7 +324,7 @@ namespace EEducationPlatform.Migrations
                     b.ToTable("CourseCategory", (string)null);
                 });
 
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Document", b =>
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.CourseDocument", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
@@ -387,7 +390,185 @@ namespace EEducationPlatform.Migrations
 
                     b.HasIndex("LectureId");
 
-                    b.ToTable("Document", (string)null);
+                    b.ToTable("CourseDocument", (string)null);
+                });
+
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.CourseInstructor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Bio")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("Experience")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CourseInstructor", (string)null);
+                });
+
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.CourseLecture", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<int?>("Length")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<DateTime?>("PublishDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("YoutubeLink")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("CourseLecture", (string)null);
+                });
+
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.CourseStudent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("CourseId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<DateTime>("EnrollmentDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<float>("Score")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CourseStudent", (string)null);
                 });
 
             modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Exam", b =>
@@ -455,128 +636,6 @@ namespace EEducationPlatform.Migrations
                     b.ToTable("Exam", (string)null);
                 });
 
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Instructor", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Bio")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<Guid?>("DeleterId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("DeleterId");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("DeletionTime");
-
-                    b.Property<string>("Experience")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false)
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Instructor", (string)null);
-                });
-
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Lecture", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<Guid?>("DeleterId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("DeleterId");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("DeletionTime");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false)
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<int?>("Length")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<DateTime?>("PublishDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("YoutubeLink")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("Lecture", (string)null);
-                });
-
             modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Question", b =>
                 {
                     b.Property<Guid>("Id")
@@ -638,62 +697,6 @@ namespace EEducationPlatform.Migrations
                     b.HasIndex("ExamId");
 
                     b.ToTable("Question", (string)null);
-                });
-
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Student", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<Guid?>("DeleterId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("DeleterId");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("DeletionTime");
-
-                    b.Property<DateTime>("EnrollmentDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false)
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<float>("Score")
-                        .HasColumnType("float");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Student", (string)null);
                 });
 
             modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.StudentAnswer", b =>
@@ -2773,7 +2776,16 @@ namespace EEducationPlatform.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Admin", b =>
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Choice", b =>
+                {
+                    b.HasOne("EEducationPlatform.Aggregates.Courses.Question", null)
+                        .WithMany("Choices")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.CourseAdmin", b =>
                 {
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
                         .WithMany("Admins")
@@ -2784,15 +2796,6 @@ namespace EEducationPlatform.Migrations
                     b.HasOne("Volo.Abp.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Choice", b =>
-                {
-                    b.HasOne("EEducationPlatform.Aggregates.Courses.Question", null)
-                        .WithMany("Choices")
-                        .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -2812,7 +2815,7 @@ namespace EEducationPlatform.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Document", b =>
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.CourseDocument", b =>
                 {
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
                         .WithMany("Documents")
@@ -2820,27 +2823,13 @@ namespace EEducationPlatform.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("EEducationPlatform.Aggregates.Courses.Lecture", null)
+                    b.HasOne("EEducationPlatform.Aggregates.Courses.CourseLecture", null)
                         .WithMany()
                         .HasForeignKey("LectureId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Exam", b =>
-                {
-                    b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
-                        .WithMany("Exams")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("EEducationPlatform.Aggregates.Courses.Lecture", null)
-                        .WithMany()
-                        .HasForeignKey("LectureId")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Instructor", b =>
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.CourseInstructor", b =>
                 {
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
                         .WithMany("Instructors")
@@ -2855,7 +2844,7 @@ namespace EEducationPlatform.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Lecture", b =>
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.CourseLecture", b =>
                 {
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
                         .WithMany("Lectures")
@@ -2864,7 +2853,7 @@ namespace EEducationPlatform.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Student", b =>
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.CourseStudent", b =>
                 {
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
                         .WithMany("Students")
@@ -2879,15 +2868,29 @@ namespace EEducationPlatform.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Exam", b =>
+                {
+                    b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
+                        .WithMany("Exams")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("EEducationPlatform.Aggregates.Courses.CourseLecture", null)
+                        .WithMany()
+                        .HasForeignKey("LectureId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
             modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Question", b =>
-            {
-                b.HasOne("EEducationPlatform.Aggregates.Courses.Exam", null)
-                    .WithMany("Questions")
-                    .HasForeignKey("ExamId")
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .IsRequired();
-            });
-            
+                {
+                    b.HasOne("EEducationPlatform.Aggregates.Courses.Exam", null)
+                        .WithMany("Questions")
+                        .HasForeignKey("ExamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.StudentAnswer", b =>
                 {
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Question", null)
@@ -2911,7 +2914,7 @@ namespace EEducationPlatform.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("EEducationPlatform.Aggregates.Courses.Student", null)
+                    b.HasOne("EEducationPlatform.Aggregates.Courses.CourseStudent", null)
                         .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
