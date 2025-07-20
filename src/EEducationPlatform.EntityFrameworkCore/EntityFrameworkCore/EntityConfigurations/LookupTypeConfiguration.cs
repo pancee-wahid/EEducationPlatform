@@ -21,6 +21,8 @@ public class LookupTypeConfiguration : IEntityTypeConfiguration<LookupType>
         builder.Property(x => x.Name).HasMaxLength(StringLength.Name);
         builder.Property(x => x.Code).HasMaxLength(StringLength.Code);
         builder.Property(x => x.Description).HasMaxLength(StringLength.Description);
+        
+        builder.HasIndex(x => x.Code).IsUnique();
 
         #endregion
 

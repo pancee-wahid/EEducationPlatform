@@ -20,12 +20,14 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.Property(x => x.Code).HasMaxLength(StringLength.Code);
         builder.Property(x => x.Description).HasMaxLength(StringLength.Description);
 
+        builder.HasIndex(x => x.Code).IsUnique();
+        builder.HasQueryFilter(e => !e.IsDeleted);
         #endregion
 
         #region Keys configuration
 
         builder.HasOne<Category>()
-            .WithMany()
+            .WithMany(category => category.Categories)
             .HasForeignKey(category => category.ParentCategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 

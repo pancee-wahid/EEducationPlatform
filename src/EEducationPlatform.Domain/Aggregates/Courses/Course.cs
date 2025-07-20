@@ -9,7 +9,6 @@ namespace EEducationPlatform.Aggregates.Courses;
 
 public class Course : FullAuditedAggregateRoot<Guid>
 {
-    public Guid Id { get; private set; }
     public string Name { get; private set; }
     public string Code { get; private set; }
     public string? Description { get; private set; }
@@ -140,15 +139,17 @@ public class Course : FullAuditedAggregateRoot<Guid>
 
     #region Course student
 
-    public void AddStudent(Guid id, Guid userId, Guid courseId, DateTime enrollmentDate, float score)
+    public void AddStudent(Guid id, Guid userId, Guid courseId, DateTime enrollmentDate, float score, bool needsEnrollmentApproval, bool isEnrollmentApproved, bool isActive)
     {
         _students.Add(new Student(
             id: id,
             userId: userId,
             courseId: courseId,
             enrollmentDate: enrollmentDate,
-            score: score
-        ));
+            score: score, 
+            needsEnrollmentApproval: needsEnrollmentApproval, 
+            isEnrollmentApproved: isEnrollmentApproved, 
+            isActive: isActive));
     }
 
     public void UpdateStudent(Student updatedStudent)
@@ -158,7 +159,11 @@ public class Course : FullAuditedAggregateRoot<Guid>
                                 .WithData("EntityName", nameof(Student))
                                 .WithData("Id", updatedStudent.Id.ToString());
 
-        student.Update(score: updatedStudent.Score);
+        student.Update(
+            score: updatedStudent.Score,
+            needsEnrollmentApproval: updatedStudent.NeedsEnrollmentApproval,
+            isEnrollmentApproved: updatedStudent.IsEnrollmentApproved,
+            isActive: updatedStudent.IsActive);
     }
 
     public void RemoveStudents(IEnumerable<Student> students)

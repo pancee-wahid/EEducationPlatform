@@ -4,6 +4,7 @@ using EEducationPlatform.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace EEducationPlatform.Migrations
 {
     [DbContext(typeof(EEducationPlatformDbContext))]
-    partial class EEducationPlatformDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250414085322_Added_Columns_To_Student_Table")]
+    partial class Added_Columns_To_Student_Table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,9 +95,6 @@ namespace EEducationPlatform.Migrations
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
 
                     b.HasIndex("ParentCategoryId");
 
@@ -284,9 +284,6 @@ namespace EEducationPlatform.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
 
                     b.ToTable("Course", (string)null);
                 });
@@ -894,9 +891,6 @@ namespace EEducationPlatform.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Code")
-                        .IsUnique();
-
                     b.ToTable("LookupType", (string)null);
                 });
 
@@ -956,9 +950,6 @@ namespace EEducationPlatform.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
 
                     b.HasIndex("LookupTypeId");
 
@@ -2789,7 +2780,7 @@ namespace EEducationPlatform.Migrations
             modelBuilder.Entity("EEducationPlatform.Aggregates.Categories.Category", b =>
                 {
                     b.HasOne("EEducationPlatform.Aggregates.Categories.Category", null)
-                        .WithMany("Categories")
+                        .WithMany()
                         .HasForeignKey("ParentCategoryId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
@@ -3097,11 +3088,6 @@ namespace EEducationPlatform.Migrations
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EEducationPlatform.Aggregates.Categories.Category", b =>
-                {
-                    b.Navigation("Categories");
                 });
 
             modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Course", b =>

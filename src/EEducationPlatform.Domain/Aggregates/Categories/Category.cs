@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace EEducationPlatform.Aggregates.Categories;
@@ -11,14 +13,36 @@ public class Category : FullAuditedAggregateRoot<Guid>
     public Guid? ParentCategoryId { get; private set; } // null only for main parent categories
     public bool HasSubCategories { get; private set; }
 
-
-    public Category(Guid id, string name, string description, string code, Guid? parentCategoryId,
-        bool hasSubCategories) : base(id)
+    private readonly List<Category> _categories = [];
+    public IEnumerable<Category> Categories => _categories.AsReadOnly();
+    
+    protected Category(){}
+    
+    public Category(Guid id, string name, string? description, string code, Guid? parentCategoryId,
+        bool hasSubCategories = false) : base(id)
     {
         Name = name;
         Description = description;
         Code = code;
         ParentCategoryId = parentCategoryId;
         HasSubCategories = hasSubCategories;
+        _categories = [];
+    }
+
+    public Category Update(string name, string? description, string code, Guid? parentCategoryId)
+    {
+        Name = name;
+        Description = description;
+        Code = code;
+        ParentCategoryId = parentCategoryId;
+
+        return this;
+    }
+
+    public Category SetHasSubCategories(bool hasSubCategories)
+    {
+        HasSubCategories = hasSubCategories;
+
+        return this;
     }
 }
