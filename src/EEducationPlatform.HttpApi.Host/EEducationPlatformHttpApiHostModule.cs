@@ -34,6 +34,7 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Microsoft.AspNetCore.Hosting;
 using Volo.Abp.AspNetCore.Serilog;
+using Volo.Abp.Auditing;
 using Volo.Abp.Identity;
 using Volo.Abp.OpenIddict;
 using Volo.Abp.Swashbuckle;
@@ -110,14 +111,23 @@ public class EEducationPlatformHttpApiHostModule : AbpModule
             });
         }
 
+        ConfigureLogging(context);
         ConfigureAuthentication(context);
         ConfigureUrls(configuration);
         ConfigureBundles();
         ConfigureConventionalControllers();
-        ConfigureHealthChecks(context);
+        // ConfigureHealthChecks(context);
         ConfigureSwagger(context, configuration);
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
+    }
+
+    private void ConfigureLogging(ServiceConfigurationContext context)
+    {
+        Configure<AbpAuditingOptions>(options =>
+        {
+            options.EntityHistorySelectors.AddAllEntities();
+        });
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
@@ -259,6 +269,7 @@ public class EEducationPlatformHttpApiHostModule : AbpModule
         app.UseAuthorization();
 
         app.UseSwagger();
+        
         app.UseAbpSwaggerUI(options =>
         {
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "EEducationPlatform API");
