@@ -27,7 +27,7 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
         #region Keys configuration
 
         builder.HasOne<Category>()
-            .WithMany(category => category.Categories)
+            .WithMany(category => category.SubCategories)
             .HasForeignKey(category => category.ParentCategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 

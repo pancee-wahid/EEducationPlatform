@@ -13,8 +13,8 @@ public class Category : FullAuditedAggregateRoot<Guid>
     public Guid? ParentCategoryId { get; private set; } // null only for main parent categories
     public bool HasSubCategories { get; private set; }
 
-    private readonly List<Category> _categories = [];
-    public IEnumerable<Category> Categories => _categories.AsReadOnly();
+    private readonly List<Category> _subCategories = [];
+    public IEnumerable<Category> SubCategories => _subCategories.AsReadOnly();
     
     protected Category(){}
     
@@ -26,7 +26,7 @@ public class Category : FullAuditedAggregateRoot<Guid>
         Code = code;
         ParentCategoryId = parentCategoryId;
         HasSubCategories = hasSubCategories;
-        _categories = [];
+        _subCategories = [];
     }
 
     public Category Update(string name, string? description, string code, Guid? parentCategoryId)
