@@ -35,7 +35,7 @@ public class Program
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                         .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
-                        .WriteTo.Async(c => c.File("Logs/logs.txt"))
+                        .WriteTo.Async(c => c.File($"Logs/logs_{DateTime.Today.Date.ToString("yyyy_MM_dd")}.txt"))
                         .WriteTo.Async(c => c.Console())
                         .WriteTo.Async(c => c.AbpStudio(services));
                 });
