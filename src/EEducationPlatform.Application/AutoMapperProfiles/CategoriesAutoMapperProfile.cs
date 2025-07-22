@@ -16,7 +16,7 @@ public class CategoriesAutoMapperProfile : Profile
             .IgnoreFullAuditedObjectProperties();
 
         CreateMap<Category, CategoryDto>()
-            .ForMember(d => d.Categories, opt => opt.MapFrom(s => s.SubCategories));
+            .ForMember(d => d.SubCategories, opt => opt.MapFrom(s => s.SubCategories));
 
     }
 }
