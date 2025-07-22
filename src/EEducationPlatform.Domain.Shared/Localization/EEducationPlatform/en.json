@@ -1,7 +1,10 @@
 {
   "Culture": "en",
   "Texts": {
-    "EDU:000001": "{EntityName} with id {Id} can't be found to be updated",
+    "EDU:000001": "{EntityName} with id {Id} can't be found to be updated.",
+    "EDU:000002": "An entity with the same key already exists.",
+    "EDU:000003": "Category can't be deleted as it has subcategories. Delete or reassign them first.",
+    
     "Validation:MustNotContainWhiteSpace": "Must not contain whitespaces.",
     
     "AppName": "EEducationPlatform",

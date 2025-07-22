@@ -60,6 +60,9 @@ public class CategoryManager : DomainService
     public async Task DeleteCategoryAsync(Guid id)
     {
         var category = await _categoryRepository.GetAsync(id, includeDetails: false);
+        if (category.HasSubCategories)
+            throw new BusinessException(EEducationPlatformDomainErrorCodes.CategoryHasSubCategories);
+        
         var parentCategoryId = category.ParentCategoryId;
 
         await _categoryRepository.DeleteAsync(category);
