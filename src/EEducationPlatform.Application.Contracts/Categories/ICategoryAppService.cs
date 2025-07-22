@@ -6,8 +6,8 @@ namespace EEducationPlatform.Categories;
 
 public interface ICategoryAppService : IApplicationService
 {
-    Task<Guid> CreateCategoryAsync(CreateCategoryDto createCategoryDto);
-    Task UpdateCategoryAsync(Guid id, UpdateCategoryDto updateCategoryDto);
-    Task DeleteCategoryAsync(Guid id);
+    Task<Guid> CreateAsync(CreateCategoryDto createCategoryDto);
+    Task UpdateAsync(Guid id, UpdateCategoryDto updateCategoryDto);
+    Task DeleteAsync(Guid id);
     Task<CategoryDto> GetAsync(Guid id, GetCategoryQueryDto queryDto);
 }

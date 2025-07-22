@@ -4,6 +4,7 @@ using Volo.Abp.Account;
 using Volo.Abp.Identity;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.FeatureManagement;
+using Volo.Abp.FluentValidation;
 using Volo.Abp.Modularity;
 using Volo.Abp.TenantManagement;
 
@@ -17,8 +18,10 @@ namespace EEducationPlatform;
     typeof(AbpIdentityApplicationModule),
     typeof(AbpAccountApplicationModule),
     typeof(AbpTenantManagementApplicationModule),
-    typeof(AbpSettingManagementApplicationModule)
-    )]
+    typeof(AbpSettingManagementApplicationModule),
+    typeof(AbpFluentValidationModule)
+)]
+
 public class EEducationPlatformApplicationModule : AbpModule
 {
     public override void ConfigureServices(ServiceConfigurationContext context)

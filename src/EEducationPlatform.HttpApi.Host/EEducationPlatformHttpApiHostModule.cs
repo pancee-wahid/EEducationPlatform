@@ -186,10 +186,14 @@ public class EEducationPlatformHttpApiHostModule : AbpModule
     {
         Configure<AbpAspNetCoreMvcOptions>(options =>
         {
-            options.ConventionalControllers.Create(typeof(EEducationPlatformApplicationModule).Assembly);
+            options.ConventionalControllers.Create(typeof(EEducationPlatformApplicationModule).Assembly,
+                opts =>
+                {
+                    opts.RootPath = "e-education-platform";
+                });
         });
     }
-
+    
     private static void ConfigureSwagger(ServiceConfigurationContext context, IConfiguration configuration)
     {
         context.Services.AddAbpSwaggerGenWithOidc(

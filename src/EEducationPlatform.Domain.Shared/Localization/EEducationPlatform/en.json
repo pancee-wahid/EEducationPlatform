@@ -2,6 +2,7 @@
   "Culture": "en",
   "Texts": {
     "EDU:000001": "{EntityName} with id {Id} can't be found to be updated",
+    "Validation:MustNotContainWhiteSpace": "Must not contain whitespaces.",
     
     "AppName": "EEducationPlatform",
     "Menu:Home": "Home",

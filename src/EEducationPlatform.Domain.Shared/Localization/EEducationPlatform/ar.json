@@ -2,6 +2,7 @@
   "culture": "ar",
   "texts": {
     "EDU:000001": "لا يمكن العثور على كيان {EntityName} بالرقم التعريفي {Id} ليتم تعديله",
+    "Validation:MustNotContainWhiteSpace": "لا يجب أن يحتوي على مسافات",
     
     "AppName": "EEducationPlatform",
     "Menu:Home": "منزل، بيت",

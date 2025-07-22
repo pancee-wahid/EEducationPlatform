@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using EEducationPlatform.Aggregates.Categories;
 using Volo.Abp.Application.Services;
 using Volo.Abp.ObjectMapping;
+using Volo.Abp.Validation;
 
 namespace EEducationPlatform.Categories;
 
@@ -12,14 +13,17 @@ public class CategoryAppService: ApplicationService, ICategoryAppService
 {
     private readonly CategoryManager _categoryManager;
     private readonly ICategoryRepository _categoryRepository;
-    
     public CategoryAppService(CategoryManager categoryManager, ICategoryRepository categoryRepository)
     {
         _categoryManager = categoryManager;
         _categoryRepository = categoryRepository;
     }
     
-    public async Task<Guid> CreateCategoryAsync(CreateCategoryDto createCategoryDto)
+    // all methods are virtual as FluentValidation doesn't work automatically while using Conventional Controllers
+    // unless methods are all virtual
+    // in case of switching to custom controllers, as we use dependency injection and inject IXAppService to it,
+    // we can remove virtual from methods here
+    public virtual async Task<Guid> CreateAsync(CreateCategoryDto createCategoryDto)
     {
         var category = ObjectMapper.Map<CreateCategoryDto, Category>(createCategoryDto);
         
@@ -28,7 +32,7 @@ public class CategoryAppService: ApplicationService, ICategoryAppService
         return result.Id;
     }
 
-    public async Task UpdateCategoryAsync(Guid id, UpdateCategoryDto updateCategoryDto)
+    public virtual async Task UpdateAsync(Guid id, UpdateCategoryDto updateCategoryDto)
     {
         updateCategoryDto.Id = id;
         var updatedCategory = ObjectMapper.Map<UpdateCategoryDto, Category>(updateCategoryDto);
@@ -36,12 +40,12 @@ public class CategoryAppService: ApplicationService, ICategoryAppService
         await _categoryManager.UpdateCategory(updatedCategory);    
     }
 
-    public async Task DeleteCategoryAsync(Guid id)
+    public virtual async Task DeleteAsync(Guid id)
     {
         await _categoryManager.DeleteCategoryAsync(id);
     }
 
-    public async Task<CategoryDto> GetAsync(Guid id, GetCategoryQueryDto queryDto)
+    public virtual async Task<CategoryDto> GetAsync(Guid id, GetCategoryQueryDto queryDto)
     {
         var category = await _categoryRepository.GetCategoryDetailsAsync(id);
 

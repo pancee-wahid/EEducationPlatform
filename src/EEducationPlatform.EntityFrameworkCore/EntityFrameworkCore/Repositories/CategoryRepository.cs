@@ -22,8 +22,8 @@ public class CategoryRepository : EfCoreRepository<EEducationPlatformDbContext, 
     {
         var dbContext = await GetDbContextAsync();
         var query = dbContext.Set<Category>().AsQueryable()
-            .Include(x => x.SubCategories.Where(sc => !sc.IsDeleted));
-        
+            .Include(x => x.SubCategories);
+
         var category = await query
                            .FirstOrDefaultAsync(x => x.Id == id)
                        ?? throw new EntityNotFoundException(typeof(Category), id);
