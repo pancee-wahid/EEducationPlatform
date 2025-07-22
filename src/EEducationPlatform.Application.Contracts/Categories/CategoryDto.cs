@@ -11,5 +11,5 @@ public class CategoryDto
     public required string Code { get; set; }
     public Guid? ParentCategoryId { get; set; } 
     public required bool HasSubCategories { get; set; }
-    public List<CategoryDto> Categories { get; set; } = [];
+    public List<CategoryDto> SubCategories { get; set; } = [];
 }
