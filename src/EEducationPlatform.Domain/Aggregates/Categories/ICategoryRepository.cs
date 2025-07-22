@@ -6,5 +6,5 @@ namespace EEducationPlatform.Aggregates.Categories;
 
 public interface ICategoryRepository : IBasicRepository<Category, Guid>
 {
-    Task<Category> GetCategoryDetailsAsync(Guid id);
+    Task<Category> GetCategoryDetailsAsync(Guid id, int maxDepth = 1);
 }

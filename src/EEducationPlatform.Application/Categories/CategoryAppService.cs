@@ -47,7 +47,7 @@ public class CategoryAppService: ApplicationService, ICategoryAppService
 
     public virtual async Task<CategoryDto> GetAsync(Guid id, GetCategoryQueryDto queryDto)
     {
-        var category = await _categoryRepository.GetCategoryDetailsAsync(id);
+        var category = await _categoryRepository.GetCategoryDetailsAsync(id, queryDto.MaxDepth);
 
         return ObjectMapper.Map<Category, CategoryDto>(category); 
     }
