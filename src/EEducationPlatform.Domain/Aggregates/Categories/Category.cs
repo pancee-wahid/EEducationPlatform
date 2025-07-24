@@ -29,11 +29,11 @@ public class Category : FullAuditedAggregateRoot<Guid>
         _subCategories = [];
     }
 
-    public Category Update(string name, string? description, string code, Guid? parentCategoryId)
+    public Category Update(string name, string? description, Guid? parentCategoryId)
     {
         Name = name;
         Description = description;
-        Code = code;
+        // Code = code;
         ParentCategoryId = parentCategoryId;
 
         return this;

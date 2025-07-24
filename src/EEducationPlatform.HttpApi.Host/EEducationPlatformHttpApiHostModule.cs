@@ -1,45 +1,39 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using Microsoft.AspNetCore.Authentication;
+using EEducationPlatform.EntityFrameworkCore;
+using EEducationPlatform.HealthChecks;
+using EEducationPlatform.MultiTenancy;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Extensions.DependencyInjection;
-using OpenIddict.Validation.AspNetCore;
-using OpenIddict.Server.AspNetCore;
-using EEducationPlatform.EntityFrameworkCore;
-using EEducationPlatform.MultiTenancy;
-using EEducationPlatform.HealthChecks;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.OpenApi.Models;
+using OpenIddict.Server.AspNetCore;
+using OpenIddict.Validation.AspNetCore;
 using Volo.Abp;
-using Volo.Abp.Studio;
 using Volo.Abp.Account;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
-using Volo.Abp.Autofac;
-using Volo.Abp.Localization;
-using Volo.Abp.Modularity;
-using Volo.Abp.UI.Navigation.Urls;
-using Volo.Abp.VirtualFileSystem;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
-using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
-using Microsoft.AspNetCore.Hosting;
+using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Auditing;
-using Volo.Abp.Identity;
+using Volo.Abp.Autofac;
+using Volo.Abp.Modularity;
 using Volo.Abp.OpenIddict;
-using Volo.Abp.Swashbuckle;
-using Volo.Abp.Studio.Client.AspNetCore;
 using Volo.Abp.Security.Claims;
+using Volo.Abp.Studio.Client.AspNetCore;
+using Volo.Abp.Swashbuckle;
+using Volo.Abp.UI.Navigation.Urls;
+using Volo.Abp.VirtualFileSystem;
 
 namespace EEducationPlatform;
 
@@ -94,8 +88,8 @@ public class EEducationPlatformHttpApiHostModule : AbpModule
 
         if (!configuration.GetValue<bool>("App:DisablePII"))
         {
-            Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
-            Microsoft.IdentityModel.Logging.IdentityModelEventSource.LogCompleteSecurityArtifact = true;
+            IdentityModelEventSource.ShowPII = true;
+            IdentityModelEventSource.LogCompleteSecurityArtifact = true;
         }
 
         if (!configuration.GetValue<bool>("AuthServer:RequireHttpsMetadata"))
@@ -191,6 +185,14 @@ public class EEducationPlatformHttpApiHostModule : AbpModule
                 {
                     opts.RootPath = "e-education-platform";
                 });
+            // options.ControllersToRemove.Add(typeof(AbpApiDefinitionController));
+            // options.ControllersToRemove.Add(typeof(AbpApplicationConfigurationController));
+            // options.ControllersToRemove.Add(typeof(AbpApplicationLocalizationController));
+            // options.ControllersToRemove.Add(typeof(AbpTenantController));
+            // options.ControllersToRemove.Add(typeof(TenantController));
+            // options.ControllersToRemove.Add(typeof(EmailSettingsController));
+            // options.ControllersToRemove.Add(typeof(FeaturesController));
+            // options.ControllersToRemove.Add(typeof(TimeZoneSettingsController));
         });
     }
     

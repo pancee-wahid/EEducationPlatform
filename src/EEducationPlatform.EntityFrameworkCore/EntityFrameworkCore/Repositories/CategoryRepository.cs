@@ -20,9 +20,12 @@ public class CategoryRepository : EfCoreRepository<EEducationPlatformDbContext, 
     public async Task<Category> GetCategoryDetailsAsync(Guid id, int maxDepth = 1)
     {
         var dbContext = await GetDbContextAsync();
-        var query = dbContext.Set<Category>().AsQueryable()
-            .Include(x => x.SubCategories);
-
+        
+        var query = dbContext.Set<Category>().AsQueryable();
+        
+        if (maxDepth > 0)
+            query = dbContext.Set<Category>().AsQueryable().Include(x => x.SubCategories);
+        
         var category = await query
                            .FirstOrDefaultAsync(x => x.Id == id)
                        ?? throw new EntityNotFoundException(typeof(Category), id);
@@ -36,10 +39,11 @@ public class CategoryRepository : EfCoreRepository<EEducationPlatformDbContext, 
                 await EnsureCollectionLoadedAsync(subCategory, x => x.SubCategories);
                 nextCategories.AddRange(subCategory.SubCategories.ToList());
             }
+
             if (nextCategories.IsNullOrEmpty()) break;
+            
             currentCategories = nextCategories;
         }
-
 
         return category;
     }

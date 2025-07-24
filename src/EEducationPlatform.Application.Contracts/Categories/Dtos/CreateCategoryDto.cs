@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EEducationPlatform.Categories;
+namespace EEducationPlatform.Categories.Dtos;
 
 public class CreateCategoryDto
 {

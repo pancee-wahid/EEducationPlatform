@@ -1,3 +1,4 @@
+using EEducationPlatform.Categories.Dtos;
 using FluentValidation;
 
 namespace EEducationPlatform.Categories.Validators;
@@ -7,6 +8,6 @@ public class GetCategoryQueryDtoValidator : AbstractValidator<GetCategoryQueryDt
     public GetCategoryQueryDtoValidator()
     {
         RuleFor(e => e.MaxDepth)
-            .InclusiveBetween(1, 5);
+            .InclusiveBetween(0, 5);
     }
 }
