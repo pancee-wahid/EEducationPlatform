@@ -5,7 +5,7 @@ namespace EEducationPlatform.Aggregates.Courses;
 
 public class Student : FullAuditedEntity<Guid>
 {
-    public Guid UserId { get; private set; }
+    public Guid PersonId { get; private set; }
     public Guid CourseId { get; private set; }
     public bool NeedsEnrollmentApproval { get; private set; }
     public bool IsEnrollmentApproved { get; private set; }
@@ -13,10 +13,10 @@ public class Student : FullAuditedEntity<Guid>
     public DateTime EnrollmentDate { get; private set; }
     public float Score { get; private set; } // calculated across all exams - may be deleted
 
-    public Student(Guid id, Guid userId, Guid courseId, DateTime enrollmentDate, float score,
+    public Student(Guid id, Guid personId, Guid courseId, DateTime enrollmentDate, float score,
         bool needsEnrollmentApproval, bool isEnrollmentApproved, bool isActive) : base(id)
     {
-        UserId = userId;
+        PersonId = personId;
         CourseId = courseId;
         EnrollmentDate = enrollmentDate;
         Score = score;

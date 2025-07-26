@@ -11,6 +11,8 @@ public static class EEducationPlatformConstants
             public const int Description = 500;
             public const int Path = 500;
             public const int Link = 500;
+            public const int FullName = 250;
         }
     }
 }
+

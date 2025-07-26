@@ -5,24 +5,12 @@ namespace EEducationPlatform.Aggregates.Courses;
 
 public class Admin : FullAuditedEntity<Guid>
 {
-    public Guid UserId { get; private set; }
+    public Guid PersonId { get; private set; }
     public Guid CourseId { get; private set; }
-    public string? Experience { get; private set; }
-    public string? Bio { get; private set; }
 
-    public Admin(Guid id, Guid userId, Guid courseId, string? experience, string? bio) : base(id)
+    public Admin(Guid id, Guid personId, Guid courseId) : base(id)
     {
-        UserId = userId;
+        PersonId = personId;
         CourseId = courseId;
-        Experience = experience;
-        Bio = bio;
-    }
-
-    public Admin Update(string? experience, string? bio)
-    {
-        Experience = experience;
-        Bio = bio;
-
-        return this;
     }
 }

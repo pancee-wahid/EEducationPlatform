@@ -5,14 +5,14 @@ namespace EEducationPlatform.Aggregates.Courses;
 
 public class Instructor : FullAuditedEntity<Guid>
 {
-    public Guid UserId { get; private set; }
+    public Guid PersonId { get; private set; }
     public Guid CourseId { get; private set; }
     public string? Experience { get; private set; }
     public string? Bio { get; private set; }
 
-    public Instructor(Guid id, Guid userId, Guid courseId, string? experience, string? bio) : base(id)
+    public Instructor(Guid id, Guid personId, Guid courseId, string? experience, string? bio) : base(id)
     {
-        UserId = userId;
+        PersonId = personId;
         CourseId = courseId;
         Experience = experience;
         Bio = bio;

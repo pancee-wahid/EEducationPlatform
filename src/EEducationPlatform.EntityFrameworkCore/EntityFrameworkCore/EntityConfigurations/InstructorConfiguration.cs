@@ -1,4 +1,5 @@
 ﻿using EEducationPlatform.Aggregates.Courses;
+using EEducationPlatform.Aggregates.Persons;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Volo.Abp.EntityFrameworkCore.Modeling;
@@ -29,9 +30,9 @@ public class InstructorConfiguration : IEntityTypeConfiguration<Instructor>
             .HasForeignKey(courseInstructor => courseInstructor.CourseId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<IdentityUser>()
+        builder.HasOne<Person>()
             .WithMany()
-            .HasForeignKey(courseInstructor => courseInstructor.UserId)
+            .HasForeignKey(person => person.PersonId)
             .OnDelete(DeleteBehavior.Restrict);
 
         #endregion

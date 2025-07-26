@@ -29,6 +29,7 @@ public static class EEducationPlatformDbContextOnModelCreatingExtensions
         builder.ApplyConfiguration(new ChoiceConfiguration());
         builder.ApplyConfiguration(new SubmissionConfiguration());
         builder.ApplyConfiguration(new StudentAnswerConfiguration());
+        builder.ApplyConfiguration(new PersonConfiguration());
         
         //builder.Entity<YourEntity>(b =>
         //{

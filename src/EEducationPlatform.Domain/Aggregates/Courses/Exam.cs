@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.Guids;
 
 namespace EEducationPlatform.Aggregates.Courses;
 
@@ -40,7 +41,6 @@ public class Exam : FullAuditedEntity<Guid>
         Description = description;
         Type = type;
         Score = score;
-        
         return this;
     }
 
@@ -58,7 +58,7 @@ public class Exam : FullAuditedEntity<Guid>
             score: score));
     }
 
-    public void UpdateQuestion(Question updatedQuestion)
+    public void UpdateQuestion(IGuidGenerator guidGenerator, Question updatedQuestion)
     {
         var question = _questions.Find(l => l.Id == updatedQuestion.Id)
                              ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
@@ -72,11 +72,48 @@ public class Exam : FullAuditedEntity<Guid>
             needsManualChecking: updatedQuestion.NeedsManualChecking,
             score: updatedQuestion.Score
         );
+
+        question.UpdateAllChoices(guidGenerator, updatedQuestion.Choices.ToList());
     }
 
     public void RemoveQuestions(IEnumerable<Question> questionsToRemove)
     {
         _questions.RemoveAll(questionsToRemove);
+    }
+
+    public void UpdateAllQuestions(IGuidGenerator guidGenerator, List<Question> updatedQuestions)
+    {
+        var questionsToRemove = _questions.Where(q => updatedQuestions.All(x => x.Id != q.Id));
+        var questionsToAdd = updatedQuestions.Where(q => q.Id == null || q.Id == Guid.Empty);
+        var questionsToUpdate = updatedQuestions.Where(q => questionsToAdd.All(x => x.Id != q.Id));
+        
+        RemoveQuestions(questionsToRemove);
+
+        foreach (var question in questionsToUpdate)
+            UpdateQuestion(guidGenerator, question);
+
+        foreach (var question in questionsToAdd)
+        {
+            AddQuestion(
+                id: guidGenerator.Create(),
+                examId: this.Id,
+                content: question.Content,
+                type: question.Type,
+                correctAnswer: question.CorrectAnswer,
+                needsManualChecking: question.NeedsManualChecking,
+                score: question.Score
+            );
+
+            foreach (var choice in question.Choices)
+            {
+                question.AddChoice(
+                    id: guidGenerator.Create(),
+                    label: choice.Label,
+                    text: choice.Text,
+                    isCorrectAnswer: choice.IsCorrectAnswer
+                );
+            }
+        }
     }
 
     #endregion

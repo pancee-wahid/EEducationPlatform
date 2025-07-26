@@ -1,9 +1,8 @@
 ﻿using EEducationPlatform.Aggregates.Courses;
+using EEducationPlatform.Aggregates.Persons;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Volo.Abp.EntityFrameworkCore.Modeling;
-using Volo.Abp.Identity;
-using static EEducationPlatform.EEducationPlatformConstants.Validations;
 
 namespace EEducationPlatform.EntityFrameworkCore.EntityConfigurations;
 
@@ -14,14 +13,7 @@ public class AdminConfiguration : IEntityTypeConfiguration<Admin>
         builder.ConfigureByConvention();
 
         builder.ToTable(nameof(Admin));
-
-        #region Properies configuration
-
-        builder.Property(x => x.Experience).HasMaxLength(StringLength.Description);
-        builder.Property(x => x.Bio).HasMaxLength(StringLength.Description);
-
-        #endregion
-
+        
         #region Keys configuration
 
         builder.HasOne<Course>()
@@ -29,9 +21,9 @@ public class AdminConfiguration : IEntityTypeConfiguration<Admin>
             .HasForeignKey(courseAdmin => courseAdmin.CourseId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<IdentityUser>()
+        builder.HasOne<Person>()
             .WithMany()
-            .HasForeignKey(courseAdmin => courseAdmin.UserId)
+            .HasForeignKey(courseAdmin => courseAdmin.PersonId)
             .OnDelete(DeleteBehavior.Restrict);
 
         #endregion
