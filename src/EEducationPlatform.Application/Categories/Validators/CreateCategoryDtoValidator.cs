@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using EEducationPlatform.Categories.Dtos;
 using EEducationPlatform.Localization;
 using FluentValidation;
 using Microsoft.Extensions.Localization;

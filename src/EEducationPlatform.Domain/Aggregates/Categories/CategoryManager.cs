@@ -27,12 +27,12 @@ public class CategoryManager : DomainService
         );
 
         if (createdCategory.ParentCategoryId.HasValue)
-            await UpdateParentCategory((Guid)createdCategory.ParentCategoryId!);
+            await UpdateParentOnAddingChild((Guid)createdCategory.ParentCategoryId!);
 
         return await _categoryRepository.InsertAsync(createdCategory);
     }
 
-    private async Task UpdateParentCategory(Guid parentCategoryId)
+    private async Task UpdateParentOnAddingChild(Guid parentCategoryId)
     {
         var parentCategory = await _categoryRepository.GetAsync(parentCategoryId, false);
         
@@ -43,17 +43,34 @@ public class CategoryManager : DomainService
         }
     }
 
-    public async Task UpdateCategory(Category category)
+    public async Task UpdateCategory(Category updatedCategory)
     {
-        var existingCategory = await _categoryRepository.GetAsync(category.Id, false);
-
+        var existingCategory = await _categoryRepository.GetAsync(updatedCategory.Id, false);
+        var oldParentCategoryId = existingCategory.ParentCategoryId;
+        var newParentCategoryId = updatedCategory.ParentCategoryId;
+        
         existingCategory.Update(
-            name: category.Name,
-            description: category.Description,
-            code: category.Code,
-            parentCategoryId: category.ParentCategoryId
+            name: updatedCategory.Name,
+            description: updatedCategory.Description,
+            // code: updatedCategory.Code,
+            parentCategoryId: updatedCategory.ParentCategoryId
         );
 
+        if (newParentCategoryId.HasValue && !oldParentCategoryId.HasValue) // add child
+        {
+            await UpdateParentOnAddingChild(newParentCategoryId.Value);
+        }   
+        else if (!newParentCategoryId.HasValue && oldParentCategoryId.HasValue) // remove child
+        {
+            await UpdateParentOnRemovingChild(oldParentCategoryId.Value, existingCategory.Id);
+        }        
+        else if (newParentCategoryId.HasValue && oldParentCategoryId.HasValue) // add to new, remove from old
+        {
+            await UpdateParentOnRemovingChild(oldParentCategoryId.Value, existingCategory.Id);
+            await UpdateParentOnAddingChild(newParentCategoryId.Value);
+        }
+        // case: null in new and old, no need to handle parents
+            
         await _categoryRepository.UpdateAsync(existingCategory);
     }
 
@@ -67,10 +84,14 @@ public class CategoryManager : DomainService
 
         await _categoryRepository.DeleteAsync(category);
 
-        if (!parentCategoryId.HasValue) return;
+        if (parentCategoryId.HasValue) 
+            await UpdateParentOnRemovingChild(parentCategoryId.Value, id);
+    }
 
+    private async Task UpdateParentOnRemovingChild(Guid parentCategoryId, Guid subCategoryId)
+    {
         var parentCategory = await _categoryRepository.GetCategoryDetailsAsync((Guid)parentCategoryId!);
-        if (parentCategory.SubCategories.Where(sc => sc.Id != id).ToList().IsNullOrEmpty())
+        if (parentCategory.SubCategories.Where(sc => sc.Id != subCategoryId).ToList().IsNullOrEmpty())
         {
             parentCategory.SetHasSubCategories(false);
             await _categoryRepository.UpdateAsync(parentCategory);

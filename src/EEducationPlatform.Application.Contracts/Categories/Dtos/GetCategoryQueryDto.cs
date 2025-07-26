@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace EEducationPlatform.Categories;
+namespace EEducationPlatform.Categories.Dtos;
 
 public class GetCategoryQueryDto
 {
