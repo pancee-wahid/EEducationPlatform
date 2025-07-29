@@ -55,11 +55,11 @@ public class CategoryRepository : EfCoreRepository<EEducationPlatformDbContext, 
     }
 
     public async Task<List<Category>> GetListAsync(string? filter, int maxResultCount, int skipCount,
-        string? sorting, bool parentsOnly = false)
+        string sorting = "Name", bool parentsOnly = false)
     {
         var dbSet = await GetDbSetAsync();
 
-        return await dbSet
+       var query = dbSet
             .WhereIf(
                 parentsOnly,
                 category => category.ParentCategoryId == Guid.Empty || category.ParentCategoryId == null
@@ -71,9 +71,11 @@ public class CategoryRepository : EfCoreRepository<EEducationPlatformDbContext, 
                             || (category.Description ?? "").ToLower().Contains(filter!.ToLower())
                             || category.Id.ToString().ToLower().Contains(filter!.ToLower())
             )
-            .OrderBy(x => sorting == "Code" ? x.Code : x.Name)
+            .OrderBy(x => sorting.ToLower().Equals("code") ? x.Code.ToLower() : x.Name.ToLower())
             .Skip(skipCount)
-            .Take(maxResultCount)
+            .Take(maxResultCount);
+           
+           return await query
             .ToListAsync();
     }
 }

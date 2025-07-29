@@ -60,7 +60,7 @@ public class CategoryAppService: ApplicationService, ICategoryAppService
             queryDto.Filter,
             queryDto.MaxResultCount,
             queryDto.SkipCount,
-            queryDto.Sorting,
+            queryDto.Sorting ?? "Name",
             queryDto.ParentsOnly
         );
         

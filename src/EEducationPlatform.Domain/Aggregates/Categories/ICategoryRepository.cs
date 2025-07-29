@@ -11,5 +11,5 @@ public interface ICategoryRepository : IBasicRepository<Category, Guid>
     Task<Category?> GetCategoryByCodeAsync(string code);
 
     Task<List<Category>> GetListAsync(string? filter, int maxResultCount, int skipCount,
-        string? sorting, bool parentsOnly = false);
+        string sorting = "Name", bool parentsOnly = false);
 }
