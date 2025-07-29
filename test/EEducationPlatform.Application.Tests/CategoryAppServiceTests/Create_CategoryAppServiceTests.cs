@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using EEducationPlatform.Categories;
 using EEducationPlatform.Categories.Dtos;
 using Shouldly;
 using Volo.Abp.Domain.Entities;
@@ -26,6 +25,7 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
         createdCategory.Code.ShouldBe(_firstCreateCategoryDto.Code);
         createdCategory.ParentCategoryId.ShouldBeNull();
         createdCategory.HasSubCategories.ShouldBeFalse();
+        createdCategory.SubCategories.ShouldBeEmpty();
     }
     
     [Fact]
@@ -62,6 +62,8 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
         var subCategory = await _categoryAppService.GetAsync(subCategoryId, new GetCategoryQueryDto{});
         subCategory.Code.ShouldBe(_secondCreateCategoryDto.Code);
         subCategory.ParentCategoryId.ShouldBe(parentCategoryId);
+        subCategory.HasSubCategories.ShouldBeFalse();
+        subCategory.SubCategories.ShouldBeEmpty();
     }
 
     [Fact] public async Task Create__Should_Fail_On_Create_Subcategory_With_Unfound_Parent()

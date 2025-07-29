@@ -15,8 +15,10 @@ public class CategoriesAutoMapperProfile : Profile
         CreateMap<UpdateCategoryDto, Category>()
             .IgnoreFullAuditedObjectProperties();
 
-        CreateMap<Category, CategoryDto>()
+        CreateMap<Category, SpecificCategoryDto>()
             .ForMember(d => d.SubCategories, opt => opt.MapFrom(s => s.SubCategories));
+
+        CreateMap<Category, CategoryDto>();
 
     }
 }

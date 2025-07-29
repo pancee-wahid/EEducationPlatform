@@ -18,6 +18,11 @@ public class CategoryManager : DomainService
 
     public async Task<Category> CreateAsync(Category category)
     {
+        if (await _categoryRepository.GetCategoryByCodeAsync(category.Code) != null)
+        {
+            throw new BusinessException(EEducationPlatformDomainErrorCodes.CategoryWithSameCodeExists);
+        }
+
         var createdCategory = new Category(
             id: GuidGenerator.Create(),
             name: category.Name,
@@ -27,7 +32,9 @@ public class CategoryManager : DomainService
         );
 
         if (createdCategory.ParentCategoryId.HasValue)
+        {
             await UpdateParentOnAddingChild((Guid)createdCategory.ParentCategoryId!);
+        }
 
         return await _categoryRepository.InsertAsync(createdCategory);
     }

@@ -7,4 +7,5 @@ public static class EEducationPlatformDomainErrorCodes
     public const string UnableToInsertWithDuplicateKey = "EDU:000002";
     public const string CategoryHasSubCategories = "EDU:000003";
 
+    public const string CategoryWithSameCodeExists = "EDU:000004";
 }

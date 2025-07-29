@@ -185,14 +185,6 @@ public class EEducationPlatformHttpApiHostModule : AbpModule
                 {
                     opts.RootPath = "e-education-platform";
                 });
-            // options.ControllersToRemove.Add(typeof(AbpApiDefinitionController));
-            // options.ControllersToRemove.Add(typeof(AbpApplicationConfigurationController));
-            // options.ControllersToRemove.Add(typeof(AbpApplicationLocalizationController));
-            // options.ControllersToRemove.Add(typeof(AbpTenantController));
-            // options.ControllersToRemove.Add(typeof(TenantController));
-            // options.ControllersToRemove.Add(typeof(EmailSettingsController));
-            // options.ControllersToRemove.Add(typeof(FeaturesController));
-            // options.ControllersToRemove.Add(typeof(TimeZoneSettingsController));
         });
     }
     
@@ -208,6 +200,7 @@ public class EEducationPlatformHttpApiHostModule : AbpModule
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "EEducationPlatform API", Version = "v1" });
                 options.DocInclusionPredicate((docName, description) => true);
                 options.CustomSchemaIds(type => type.FullName);
+                options.HideAbpEndpoints();
             });
     }
 
