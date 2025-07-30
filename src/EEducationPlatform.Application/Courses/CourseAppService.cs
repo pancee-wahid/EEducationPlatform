@@ -8,9 +8,9 @@ namespace EEducationPlatform.Courses;
 
 public class CourseAppService : ApplicationService, ICourseAppService
 {
-    
     private readonly CourseManager _courseManager;
     
+    public CourseAppService(CourseManager courseManager)
     {
         _courseManager = courseManager;
     }
