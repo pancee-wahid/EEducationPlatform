@@ -16,7 +16,7 @@ public class Question: FullAuditedEntity<Guid>
     public bool NeedsManualChecking { get; private set; }
     public float Score { get; private set; }
     
-    private readonly List<Choice> _choices;
+    private readonly List<Choice> _choices = [];
     public IEnumerable<Choice> Choices => _choices.AsReadOnly();
     
     public Question(Guid id, Guid examId, string content, QuestionType type, string? correctAnswer,
@@ -28,16 +28,17 @@ public class Question: FullAuditedEntity<Guid>
         CorrectAnswer = correctAnswer;
         NeedsManualChecking = needsManualChecking;
         Score = score;
-        _choices = [];
     }
 
-    public Question Update(string content, QuestionType type, string? correctAnswer, bool needsManualChecking, float score)
+    public Question Update(IGuidGenerator guidGenerator, string content, QuestionType type, string? correctAnswer, bool needsManualChecking, float score, List<Choice>  choices)
     {
         Content = content;
         Type = type;
         CorrectAnswer = correctAnswer;
         NeedsManualChecking = needsManualChecking;
         Score = score;
+        
+        UpdateAllChoices(guidGenerator, choices);
         
         return this;
     }
@@ -78,7 +79,9 @@ public class Question: FullAuditedEntity<Guid>
         RemoveChoices(choicesToRemove);
 
         foreach (var choice in choicesToUpdate)
+        {
             UpdateChoice(choice);
+        }
 
         foreach (var choice in choicesToAdd)
         {

@@ -23,7 +23,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Folder Include="Courses\Dtos\" />
+    <Folder Include="Courses\Events\" />
   </ItemGroup>
 
 </Project>

@@ -12,4 +12,6 @@ public interface ICategoryRepository : IBasicRepository<Category, Guid>
 
     Task<List<Category>> GetListAsync(string? filter, int maxResultCount, int skipCount,
         string sorting = "Name", bool parentsOnly = false);
+    
+    Task<List<Guid>> GetUnfoundCategoriesIds(List<Guid> categoriesIds);
 }

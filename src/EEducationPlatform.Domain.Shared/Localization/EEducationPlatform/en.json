@@ -5,6 +5,8 @@
     "EDU:000002": "An entity with the same key already exists.",
     "EDU:000003": "Category can't be deleted as it has subcategories. Delete or reassign them first.",
     "EDU:000004": "A category with the same code exists.",
+    "EDU:000005": "A course with the same code exists.",
+    "EDU:000006": "The following categories are not found: {CategoriesIds}",
     
     "Validation:MustNotContainWhiteSpace": "Must not contain whitespaces.",
     

@@ -15,30 +15,33 @@ public class Course : FullAuditedAggregateRoot<Guid>
     public bool IsPaid { get; private set; }
     public float? SubscriptionFees { get; private set; } // null only when IsPaid is false
     public bool IsActive { get; private set; } 
+    public bool NeedsEnrollmentApproval { get; private set; }
 
-    private readonly List<CourseCategory> _categories;
+    private readonly List<CourseCategory> _categories = [];
     public IEnumerable<CourseCategory> Categories => _categories.AsReadOnly();
 
-    private readonly List<Instructor> _instructors;
+    private readonly List<Instructor> _instructors = [];
     public IEnumerable<Instructor> Instructors => _instructors.AsReadOnly();
 
-    private readonly List<Admin> _admins;
+    private readonly List<Admin> _admins = [];
     public IEnumerable<Admin> Admins => _admins.AsReadOnly();
 
-    private readonly List<Student> _students;
+    private readonly List<Student> _students = [];
     public IEnumerable<Student> Students => _students.AsReadOnly();
 
-    private readonly List<Lecture> _lectures;
+    private readonly List<Lecture> _lectures = [];
     public IEnumerable<Lecture> Lectures => _lectures.AsReadOnly();
 
-    private readonly List<Document> _documents;
+    private readonly List<Document> _documents = [];
     public IEnumerable<Document> Documents => _documents.AsReadOnly();
 
-    private readonly List<Exam> _exams;
+    private readonly List<Exam> _exams = [];
     public IEnumerable<Exam> Exams => _exams.AsReadOnly();
 
+    protected Course() {}
+    
     public Course(Guid id, string name, string code, string? description, bool isPaid,
-        float? subscriptionFees) : base(id)
+        float? subscriptionFees, bool needsEnrollmentApproval) : base(id)
     {
         Name = name;
         Code = code;
@@ -46,13 +49,7 @@ public class Course : FullAuditedAggregateRoot<Guid>
         IsPaid = isPaid;
         SubscriptionFees = subscriptionFees;
         IsActive = true; // course is created active initially
-        _categories = [];
-        _instructors = [];
-        _admins = [];
-        _students = [];
-        _lectures = [];
-        _documents = [];
-        _exams = [];
+        NeedsEnrollmentApproval = needsEnrollmentApproval;
     }
 
     public Course Activate(bool isActive)
@@ -62,35 +59,46 @@ public class Course : FullAuditedAggregateRoot<Guid>
         return this;
     }
 
-    public Course UpdateCourseInfo(string name, string code, string? description)
+    public Course UpdateCourseInfo(string name, string code, string? description, bool isPaid, float? subscriptionFees, bool needsEnrollmentApproval)
     {
         Name = name;
         Code = code;
         Description = description;
-
-        return this;
-    }
-
-    public Course UpdateCourseFeesInfo(bool isPaid, float? subscriptionFees)
-    {
         IsPaid = isPaid;
         SubscriptionFees = subscriptionFees;
-
+        NeedsEnrollmentApproval = needsEnrollmentApproval;
+        
         return this;
     }
     
     #region Course category
 
-    public void AddCourseCategory(IGuidGenerator guidGenerator, Guid categoryId)
+    public void AddCourseCategory(Guid id, Guid categoryId)
     {
         _categories.Add(new CourseCategory(
-            id: guidGenerator.Create(),
+            id: id,
             categoryId: categoryId,
             courseId: this.Id)
         );
     }
 
-    public void RemoveCourseCategories(IEnumerable<CourseCategory> courseCategories)
+    public void UpdateAllCourseCategories(IGuidGenerator guidGenerator, List<CourseCategory> updatedCourseCategories)
+    {
+        var categoriesToRemove = _categories.Where(c => 
+            updatedCourseCategories.All(uc => uc.CategoryId != c.CategoryId)).ToList();
+        
+        RemoveCourseCategories(categoriesToRemove);
+
+        var categoriesToAdd = updatedCourseCategories.Where(uc => 
+            _categories.All(c => c.CategoryId != uc.CategoryId)).ToList();
+
+        foreach (var courseCategory in categoriesToAdd)
+        {
+            AddCourseCategory(guidGenerator.Create(), courseCategory.CategoryId);
+        }
+    }
+
+    public void RemoveCourseCategories(List<CourseCategory> courseCategories)
     {
         _categories.RemoveAll(courseCategories);
     }
@@ -122,7 +130,7 @@ public class Course : FullAuditedAggregateRoot<Guid>
             bio: bio
         );
     }
-
+    
     public void RemoveInstructors(IEnumerable<Instructor> instructors)
     {
         _instructors.RemoveAll(instructors);
@@ -141,7 +149,7 @@ public class Course : FullAuditedAggregateRoot<Guid>
         ));
     }
     
-    public void RemoveAdmins(IEnumerable<Admin> admins)
+    public void RemoveAdmins(List<Admin> admins)
     {
         _admins.RemoveAll(admins);
     }
@@ -151,7 +159,7 @@ public class Course : FullAuditedAggregateRoot<Guid>
     #region Course student
 
     public void AddStudent(IGuidGenerator guidGenerator, Guid userId, Guid courseId, DateTime enrollmentDate,
-        float score, bool needsEnrollmentApproval, bool isEnrollmentApproved, bool isActive)
+        float score, bool isEnrollmentApproved, bool isActive)
     {
         _students.Add(new Student(
             id: guidGenerator.Create(),
@@ -159,7 +167,6 @@ public class Course : FullAuditedAggregateRoot<Guid>
             courseId: courseId,
             enrollmentDate: enrollmentDate,
             score: score,
-            needsEnrollmentApproval: needsEnrollmentApproval,
             isEnrollmentApproved: isEnrollmentApproved,
             isActive: isActive));
     }
@@ -173,12 +180,11 @@ public class Course : FullAuditedAggregateRoot<Guid>
 
         student.Update(
             score: updatedStudent.Score,
-            needsEnrollmentApproval: updatedStudent.NeedsEnrollmentApproval,
             isEnrollmentApproved: updatedStudent.IsEnrollmentApproved,
             isActive: updatedStudent.IsActive);
     }
 
-    public void RemoveStudents(IEnumerable<Student> students)
+    public void RemoveStudents(List<Student> students)
     {
         _students.RemoveAll(students);
     }
@@ -188,10 +194,10 @@ public class Course : FullAuditedAggregateRoot<Guid>
     #region Course lecture
 
     public void AddLecture(IGuidGenerator guidGenerator, string name, string? description, int? length,
-        DateTime? publishDate,
-        string? youtubeLink)
+        DateTime? publishDate, string? youtubeLink)
     {
-        _lectures.Add(new(id: guidGenerator.Create(),
+        _lectures.Add(new Lecture(
+            id: guidGenerator.Create(),
             name: name,
             description: description,
             courseId: this.Id,
@@ -216,7 +222,7 @@ public class Course : FullAuditedAggregateRoot<Guid>
             youtubeLink: updatedLecture.YoutubeLink);
     }
 
-    public void RemoveLectures(IEnumerable<Lecture> lectures)
+    public void RemoveLectures(List<Lecture> lectures)
     {
         _lectures.RemoveAll(lectures);
     }
@@ -226,8 +232,7 @@ public class Course : FullAuditedAggregateRoot<Guid>
     #region Course document
 
     public void AddDocument(IGuidGenerator guidGenerator, string name, DocumentType type, Guid lectureId, string path,
-        int size,
-        int pagesCount)
+        int size, int pagesCount)
     {
         _documents.Add(new Document(
             id: guidGenerator.Create(),
@@ -241,7 +246,7 @@ public class Course : FullAuditedAggregateRoot<Guid>
         ));
     }
 
-    public void RemoveDocuments(IEnumerable<Document> documents)
+    public void RemoveDocuments(List<Document> documents)
     {
         _documents.RemoveAll(documents);
     }
@@ -263,20 +268,21 @@ public class Course : FullAuditedAggregateRoot<Guid>
             score: score
         );
 
-        _exams.Add(newExam);
-
         foreach (var question in questions)
         {
             newExam.AddQuestion(
-                id: guidGenerator.Create(),
+                guidGenerator: guidGenerator,
                 examId: newExam.Id,
                 content: question.Content,
                 type: question.Type,
                 correctAnswer: question.CorrectAnswer,
                 needsManualChecking: question.NeedsManualChecking,
-                score: question.Score
+                score: question.Score,
+                choices:  question.Choices.ToList()
             );
         }
+        
+        _exams.Add(newExam);
     }
 
     public void UpdateExam(IGuidGenerator guidGenerator, Exam updatedExam)
@@ -287,13 +293,14 @@ public class Course : FullAuditedAggregateRoot<Guid>
                        .WithData("Id", updatedExam.Id.ToString());
 
         exam.Update(
+            guidGenerator: guidGenerator,
             name: updatedExam.Name,
             description: updatedExam.Description,
             type: updatedExam.Type,
-            score: updatedExam.Score
+            score: updatedExam.Score,
+            questions: updatedExam.Questions.ToList()
         );
         
-        exam.UpdateAllQuestions(guidGenerator, updatedExam.Questions.ToList());
     }
 
     public void RemoveExams(IEnumerable<Exam> exams)

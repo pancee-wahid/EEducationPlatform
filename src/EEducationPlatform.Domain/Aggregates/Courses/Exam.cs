@@ -12,18 +12,21 @@ public class Exam : FullAuditedEntity<Guid>
     public string Name { get; private set; }
     public string? Description { get; private set; }
     public Guid CourseId { get; private set; }
-    public Guid? LectureId { get; private set; } // null only when exam is not related to a lecture but to the course overall
+    // null only when exam is not related to a lecture but to the course overall
+    public Guid? LectureId { get; private set; } 
+
     public ExamType Type { get; private set; }
     public float Score { get; private set; } // score of the exam 
 
-    private readonly List<Question> _questions;
+    private readonly List<Question> _questions = [];
     public IEnumerable<Question> Questions => _questions.AsReadOnly();
 
-    
-    private readonly List<Submission> _submissions;
+
+    private readonly List<Submission> _submissions = [];
     public IEnumerable<Submission> Submissions => _submissions.AsReadOnly();
-    
-    public Exam(Guid id, string name, string? description, Guid courseId, Guid? lectureId, ExamType type, float score) : base(id)
+
+    public Exam(Guid id, string name, string? description, Guid courseId, Guid? lectureId, ExamType type,
+        float score) : base(id)
     {
         Name = name;
         Description = description;
@@ -31,49 +34,63 @@ public class Exam : FullAuditedEntity<Guid>
         LectureId = lectureId;
         Type = type;
         Score = score;
-        _questions = [];
-        _submissions = [];
     }
 
-    public Exam Update(string name, string? description, ExamType type, float score)
+    public Exam Update(IGuidGenerator guidGenerator, string name, string? description, ExamType type, float score,
+        List<Question> questions)
     {
         Name = name;
         Description = description;
         Type = type;
         Score = score;
+
+        UpdateAllQuestions(guidGenerator, questions.ToList());
+
         return this;
     }
 
     #region Exam questions
 
-    public void AddQuestion(Guid id, Guid examId, string content, QuestionType type, string correctAnswer, bool needsManualChecking, float score)
+    public void AddQuestion(IGuidGenerator guidGenerator, Guid examId, string content, QuestionType type,
+        string correctAnswer, bool needsManualChecking, float score, List<Choice> choices)
     {
-        _questions.Add(new Question(
-            id: id,
+        var question = new Question(
+            id: guidGenerator.Create(),
             examId: examId,
             content: content,
             type: type,
             correctAnswer: correctAnswer,
-            needsManualChecking: needsManualChecking, 
-            score: score));
+            needsManualChecking: needsManualChecking,
+            score: score);
+
+        foreach (var choice in choices)
+        {
+            question.AddChoice(
+                id: guidGenerator.Create(),
+                label: choice.Label,
+                text: choice.Text,
+                isCorrectAnswer: choice.IsCorrectAnswer);
+        }
+
+        _questions.Add(question);
     }
 
     public void UpdateQuestion(IGuidGenerator guidGenerator, Question updatedQuestion)
     {
         var question = _questions.Find(l => l.Id == updatedQuestion.Id)
-                             ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
-                                 .WithData("EntityName", nameof(Question))
-                                 .WithData("Id", updatedQuestion.Id.ToString());
+                       ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
+                           .WithData("EntityName", nameof(Question))
+                           .WithData("Id", updatedQuestion.Id.ToString());
 
         question.Update(
+            guidGenerator: guidGenerator,
             content: updatedQuestion.Content,
             type: updatedQuestion.Type,
             correctAnswer: updatedQuestion.CorrectAnswer,
             needsManualChecking: updatedQuestion.NeedsManualChecking,
-            score: updatedQuestion.Score
+            score: updatedQuestion.Score,
+            choices: updatedQuestion.Choices.ToList()
         );
-
-        question.UpdateAllChoices(guidGenerator, updatedQuestion.Choices.ToList());
     }
 
     public void RemoveQuestions(IEnumerable<Question> questionsToRemove)
@@ -86,42 +103,36 @@ public class Exam : FullAuditedEntity<Guid>
         var questionsToRemove = _questions.Where(q => updatedQuestions.All(x => x.Id != q.Id));
         var questionsToAdd = updatedQuestions.Where(q => q.Id == null || q.Id == Guid.Empty);
         var questionsToUpdate = updatedQuestions.Where(q => questionsToAdd.All(x => x.Id != q.Id));
-        
+
         RemoveQuestions(questionsToRemove);
 
         foreach (var question in questionsToUpdate)
+        {
             UpdateQuestion(guidGenerator, question);
+        }
 
         foreach (var question in questionsToAdd)
         {
             AddQuestion(
-                id: guidGenerator.Create(),
+                guidGenerator: guidGenerator,
                 examId: this.Id,
                 content: question.Content,
                 type: question.Type,
                 correctAnswer: question.CorrectAnswer,
                 needsManualChecking: question.NeedsManualChecking,
-                score: question.Score
+                score: question.Score,
+                choices: question.Choices.ToList()
             );
-
-            foreach (var choice in question.Choices)
-            {
-                question.AddChoice(
-                    id: guidGenerator.Create(),
-                    label: choice.Label,
-                    text: choice.Text,
-                    isCorrectAnswer: choice.IsCorrectAnswer
-                );
-            }
         }
     }
 
     #endregion
-    
-    
+
+
     #region Exam submissions
 
-    public void AddSubmission(Guid id, Guid examId, Guid studentId, float score, DateTime submissionDate, bool isSubmitted)
+    public void AddSubmission(Guid id, Guid examId, Guid studentId, float score, DateTime submissionDate,
+        bool isSubmitted)
     {
         _submissions.Add(new Submission(
             id: id,
@@ -132,13 +143,13 @@ public class Exam : FullAuditedEntity<Guid>
             isSubmitted: isSubmitted
         ));
     }
-    
+
     // TODO: check adding update method 
 
     public void RemoveSubmissions(IEnumerable<Submission> submissions)
     {
         _submissions.RemoveAll(submissions);
     }
-    
+
     #endregion
 }

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using EEducationPlatform.Aggregates.Courses;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -13,11 +15,10 @@ public class CourseRepository : EfCoreRepository<EEducationPlatformDbContext, Co
 
     }
 
-    // public async Task<Person> FindByNameAsync(string name)
-    // {
-    //     var dbContext = await GetDbContextAsync();
-    //     return await dbContext.Set<Person>()
-    //         .Where(p => p.Name == name)
-    //         .FirstOrDefaultAsync();
-    // }
+    
+    public async Task<Course?> GetCourseByCodeAsync(string code)
+    {
+        var dbSet = await GetDbSetAsync();
+        return await dbSet.FirstOrDefaultAsync(c => c.Code == code);
+    }
 }

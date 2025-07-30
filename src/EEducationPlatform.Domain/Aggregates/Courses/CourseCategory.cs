@@ -8,6 +8,7 @@ public class CourseCategory : AuditedEntity<Guid>
     public Guid CategoryId { get; private set; }
     public Guid CourseId { get; private set; }
 
+    protected CourseCategory() {}
     public CourseCategory(Guid id, Guid categoryId, Guid courseId) : base(id)
     {
         CategoryId = categoryId;
