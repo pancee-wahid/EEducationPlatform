@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EEducationPlatform.Aggregates.Categories;
 using EEducationPlatform.Categories.Dtos;
+using EEducationPlatform.Categories.Events;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.EventBus.Local;
 
 namespace EEducationPlatform.Categories;
 
@@ -12,10 +14,14 @@ public class CategoryAppService: ApplicationService, ICategoryAppService
 {
     private readonly CategoryManager _categoryManager;
     private readonly ICategoryRepository _categoryRepository;
-    public CategoryAppService(CategoryManager categoryManager, ICategoryRepository categoryRepository)
+    private readonly ILocalEventBus _localEventBus;
+    
+    public CategoryAppService(CategoryManager categoryManager, ICategoryRepository categoryRepository,
+        ILocalEventBus localEventBus)
     {
         _categoryManager = categoryManager;
         _categoryRepository = categoryRepository;
+        _localEventBus = localEventBus;
     }
     
     // all methods are virtual as FluentValidation doesn't work automatically while using Conventional Controllers
@@ -24,24 +30,44 @@ public class CategoryAppService: ApplicationService, ICategoryAppService
     // we can remove virtual from methods here
     public virtual async Task<Guid> CreateAsync(CreateCategoryDto dto)
     {
-        var category = ObjectMapper.Map<CreateCategoryDto, Category>(dto);
+        var mappedCategory = ObjectMapper.Map<CreateCategoryDto, Category>(dto);
         
-        var result = await _categoryManager.CreateAsync(category);
+        var createdCategory = await _categoryManager.CreateAsync(mappedCategory);
         
-        return result.Id;
+        await _localEventBus.PublishAsync(new CategoryCreatedEto
+        {
+            Id = createdCategory.Id,
+            Name = createdCategory.Name,
+            Code = createdCategory.Code,
+            ParentCategoryId = createdCategory.ParentCategoryId
+        });
+        
+        return createdCategory.Id;
     }
 
     public virtual async Task UpdateAsync(Guid id, UpdateCategoryDto dto)
     {
-        dto.Id = id;
         var updatedCategory = ObjectMapper.Map<UpdateCategoryDto, Category>(dto);
         
-        await _categoryManager.UpdateCategory(updatedCategory);    
+        await _categoryManager.UpdateCategory(id, updatedCategory);    
+        
+        await _localEventBus.PublishAsync(new CategoryCreatedEto
+        {
+            Id = id,
+            Name = updatedCategory.Name,
+            Code = updatedCategory.Code,
+            ParentCategoryId = updatedCategory.ParentCategoryId
+        });
     }
 
     public virtual async Task DeleteAsync(Guid id)
     {
         await _categoryManager.DeleteCategoryAsync(id);
+        
+        await _localEventBus.PublishAsync(new CategoryDeletedEto
+        {
+            Id = id
+        });
     }
 
     /// <summary>

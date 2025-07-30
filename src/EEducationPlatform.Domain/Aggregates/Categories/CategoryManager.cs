@@ -39,45 +39,33 @@ public class CategoryManager : DomainService
         return await _categoryRepository.InsertAsync(createdCategory);
     }
 
-    private async Task UpdateParentOnAddingChild(Guid parentCategoryId)
+    public async Task UpdateCategory(Guid id, Category updatedCategory)
     {
-        var parentCategory = await _categoryRepository.GetAsync(parentCategoryId, false);
-        
-        if (!parentCategory.HasSubCategories)
-        {
-            parentCategory.SetHasSubCategories(true);
-            await _categoryRepository.UpdateAsync(parentCategory);
-        }
-    }
-
-    public async Task UpdateCategory(Category updatedCategory)
-    {
-        var existingCategory = await _categoryRepository.GetAsync(updatedCategory.Id, false);
+        var existingCategory = await _categoryRepository.GetAsync(id, false);
         var oldParentCategoryId = existingCategory.ParentCategoryId;
         var newParentCategoryId = updatedCategory.ParentCategoryId;
-        
+
         existingCategory.Update(
             name: updatedCategory.Name,
             description: updatedCategory.Description,
-            // code: updatedCategory.Code,
             parentCategoryId: updatedCategory.ParentCategoryId
         );
 
         if (newParentCategoryId.HasValue && !oldParentCategoryId.HasValue) // add child
         {
             await UpdateParentOnAddingChild(newParentCategoryId.Value);
-        }   
+        }
         else if (!newParentCategoryId.HasValue && oldParentCategoryId.HasValue) // remove child
         {
             await UpdateParentOnRemovingChild(oldParentCategoryId.Value, existingCategory.Id);
-        }        
+        }
         else if (newParentCategoryId.HasValue && oldParentCategoryId.HasValue) // add to new, remove from old
         {
             await UpdateParentOnRemovingChild(oldParentCategoryId.Value, existingCategory.Id);
             await UpdateParentOnAddingChild(newParentCategoryId.Value);
         }
         // case: null in new and old, no need to handle parents
-            
+
         await _categoryRepository.UpdateAsync(existingCategory);
     }
 
@@ -86,12 +74,12 @@ public class CategoryManager : DomainService
         var category = await _categoryRepository.GetAsync(id, includeDetails: false);
         if (category.HasSubCategories)
             throw new BusinessException(EEducationPlatformDomainErrorCodes.CategoryHasSubCategories);
-        
+
         var parentCategoryId = category.ParentCategoryId;
 
         await _categoryRepository.DeleteAsync(category);
 
-        if (parentCategoryId.HasValue) 
+        if (parentCategoryId.HasValue)
             await UpdateParentOnRemovingChild(parentCategoryId.Value, id);
     }
 
@@ -101,6 +89,17 @@ public class CategoryManager : DomainService
         if (parentCategory.SubCategories.Where(sc => sc.Id != subCategoryId).ToList().IsNullOrEmpty())
         {
             parentCategory.SetHasSubCategories(false);
+            await _categoryRepository.UpdateAsync(parentCategory);
+        }
+    }
+    
+    private async Task UpdateParentOnAddingChild(Guid parentCategoryId)
+    {
+        var parentCategory = await _categoryRepository.GetAsync(parentCategoryId, false);
+
+        if (!parentCategory.HasSubCategories)
+        {
+            parentCategory.SetHasSubCategories(true);
             await _categoryRepository.UpdateAsync(parentCategory);
         }
     }
