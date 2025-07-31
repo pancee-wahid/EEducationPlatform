@@ -6,21 +6,25 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EEducationPlatform.Migrations
 {
     /// <inheritdoc />
-    public partial class Added_Person_Table_And_Adjusted_Student_Admin_Instructor : Migration
+    public partial class Changes_To_Courses_Tables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Admin_AbpUsers_UserId",
+                name: "FK_CourseAdmin_AbpUsers_UserId",
                 table: "Admin");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Instructor_AbpUsers_UserId",
+                name: "FK_CourseInstructor_AbpUsers_UserId",
                 table: "Instructor");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Student_AbpUsers_UserId",
+                name: "FK_CourseStudent_AbpUsers_UserId",
+                table: "Student");
+
+            migrationBuilder.DropColumn(
+                name: "NeedsEnrollmentApproval",
                 table: "Student");
 
             migrationBuilder.DropColumn(
@@ -60,6 +64,29 @@ namespace EEducationPlatform.Migrations
                 name: "IX_Admin_UserId",
                 table: "Admin",
                 newName: "IX_Admin_PersonId");
+
+            migrationBuilder.AddColumn<string>(
+                name: "ConcurrencyStamp",
+                table: "Exam",
+                type: "varchar(40)",
+                maxLength: 40,
+                nullable: false,
+                defaultValue: "")
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.AddColumn<string>(
+                name: "ExtraProperties",
+                table: "Exam",
+                type: "longtext",
+                nullable: false)
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.AddColumn<bool>(
+                name: "NeedsEnrollmentApproval",
+                table: "Course",
+                type: "tinyint(1)",
+                nullable: false,
+                defaultValue: false);
 
             migrationBuilder.CreateTable(
                 name: "Person",
@@ -152,6 +179,18 @@ namespace EEducationPlatform.Migrations
             migrationBuilder.DropTable(
                 name: "Person");
 
+            migrationBuilder.DropColumn(
+                name: "ConcurrencyStamp",
+                table: "Exam");
+
+            migrationBuilder.DropColumn(
+                name: "ExtraProperties",
+                table: "Exam");
+
+            migrationBuilder.DropColumn(
+                name: "NeedsEnrollmentApproval",
+                table: "Course");
+
             migrationBuilder.RenameColumn(
                 name: "PersonId",
                 table: "Student",
@@ -182,6 +221,13 @@ namespace EEducationPlatform.Migrations
                 table: "Admin",
                 newName: "IX_Admin_UserId");
 
+            migrationBuilder.AddColumn<bool>(
+                name: "NeedsEnrollmentApproval",
+                table: "Student",
+                type: "tinyint(1)",
+                nullable: false,
+                defaultValue: false);
+
             migrationBuilder.AddColumn<string>(
                 name: "Bio",
                 table: "Admin",
@@ -199,7 +245,7 @@ namespace EEducationPlatform.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Admin_AbpUsers_UserId",
+                name: "FK_CourseAdmin_AbpUsers_UserId",
                 table: "Admin",
                 column: "UserId",
                 principalTable: "AbpUsers",
@@ -207,7 +253,7 @@ namespace EEducationPlatform.Migrations
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Instructor_AbpUsers_UserId",
+                name: "FK_CourseInstructor_AbpUsers_UserId",
                 table: "Instructor",
                 column: "UserId",
                 principalTable: "AbpUsers",
@@ -215,7 +261,7 @@ namespace EEducationPlatform.Migrations
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Student_AbpUsers_UserId",
+                name: "FK_CourseStudent_AbpUsers_UserId",
                 table: "Student",
                 column: "UserId",
                 principalTable: "AbpUsers",

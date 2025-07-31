@@ -4,6 +4,7 @@ using EEducationPlatform.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace EEducationPlatform.Migrations
 {
     [DbContext(typeof(EEducationPlatformDbContext))]
-    partial class EEducationPlatformDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250731192045_Changes_To_Courses_Tables")]
+    partial class Changes_To_Courses_Tables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

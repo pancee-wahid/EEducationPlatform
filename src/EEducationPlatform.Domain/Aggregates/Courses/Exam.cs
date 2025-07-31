@@ -7,7 +7,7 @@ using Volo.Abp.Guids;
 
 namespace EEducationPlatform.Aggregates.Courses;
 
-public class Exam : FullAuditedEntity<Guid>
+public class Exam : FullAuditedAggregateRoot<Guid>
 {
     public string Name { get; private set; }
     public string? Description { get; private set; }

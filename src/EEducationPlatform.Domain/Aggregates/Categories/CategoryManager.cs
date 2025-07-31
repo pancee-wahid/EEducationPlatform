@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EEducationPlatform.Aggregates.Courses;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
 
@@ -10,10 +11,12 @@ namespace EEducationPlatform.Aggregates.Categories;
 public class CategoryManager : DomainService
 {
     private readonly ICategoryRepository _categoryRepository;
+    private readonly ICourseRepository _courseRepository;
 
-    public CategoryManager(ICategoryRepository categoryRepository)
+    public CategoryManager(ICategoryRepository categoryRepository, ICourseRepository courseRepository)
     {
         _categoryRepository = categoryRepository;
+        _courseRepository = courseRepository;
     }
 
     public async Task<Category> CreateAsync(Category category)
@@ -71,16 +74,26 @@ public class CategoryManager : DomainService
 
     public async Task DeleteCategoryAsync(Guid id)
     {
+        var hasCourses = await _courseRepository.AreAnyCoursesBelongToCategory(id);
+        if (hasCourses)
+        {
+            throw new BusinessException(EEducationPlatformDomainErrorCodes.CategoryHasCourses);
+        }
+        
         var category = await _categoryRepository.GetAsync(id, includeDetails: false);
         if (category.HasSubCategories)
+        {
             throw new BusinessException(EEducationPlatformDomainErrorCodes.CategoryHasSubCategories);
+        }
 
         var parentCategoryId = category.ParentCategoryId;
 
         await _categoryRepository.DeleteAsync(category);
 
         if (parentCategoryId.HasValue)
+        {
             await UpdateParentOnRemovingChild(parentCategoryId.Value, id);
+        }
     }
 
     private async Task UpdateParentOnRemovingChild(Guid parentCategoryId, Guid subCategoryId)

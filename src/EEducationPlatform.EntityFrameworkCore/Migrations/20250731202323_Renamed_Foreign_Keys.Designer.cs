@@ -13,8 +13,8 @@ using Volo.Abp.EntityFrameworkCore;
 namespace EEducationPlatform.Migrations
 {
     [DbContext(typeof(EEducationPlatformDbContext))]
-    [Migration("20250725145430_Added_Person_Table_And_Adjusted_Student_Admin_Instructor")]
-    partial class Added_Person_Table_And_Adjusted_Student_Admin_Instructor
+    [Migration("20250731202323_Renamed_Foreign_Keys")]
+    partial class Renamed_Foreign_Keys
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -278,6 +278,9 @@ namespace EEducationPlatform.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<bool>("NeedsEnrollmentApproval")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<float?>("SubscriptionFees")
                         .HasColumnType("float");
 
@@ -399,6 +402,13 @@ namespace EEducationPlatform.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
                     b.Property<Guid>("CourseId")
                         .HasColumnType("char(36)");
 
@@ -421,6 +431,11 @@ namespace EEducationPlatform.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -690,9 +705,6 @@ namespace EEducationPlatform.Migrations
                     b.Property<Guid?>("LastModifierId")
                         .HasColumnType("char(36)")
                         .HasColumnName("LastModifierId");
-
-                    b.Property<bool>("NeedsEnrollmentApproval")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<Guid>("PersonId")
                         .HasColumnType("char(36)");
