@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 
 namespace EEducationPlatform.Categories.Dtos;
 
 public class CategoryDto
 {
-    public required Guid Id { get; set; }
-    public required string Name { get; set; }
+    public Guid Id { get; set; }
+    public string Name { get; set; }
     public string? Description { get; set; }
-    public required string Code { get; set; }
+    public string Code { get; set; }
     public Guid? ParentCategoryId { get; set; } 
-    public required bool HasSubCategories { get; set; }
-    public List<CategoryDto> SubCategories { get; set; } = [];
+    public bool HasSubCategories { get; set; }
 }

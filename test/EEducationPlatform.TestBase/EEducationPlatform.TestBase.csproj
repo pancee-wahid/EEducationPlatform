@@ -42,4 +42,8 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\EEducationPlatform.Domain\EEducationPlatform.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

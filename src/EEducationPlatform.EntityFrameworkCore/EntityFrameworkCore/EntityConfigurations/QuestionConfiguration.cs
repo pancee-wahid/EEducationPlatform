@@ -26,7 +26,7 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
         builder.HasOne<Exam>()
             .WithMany(courseExam => courseExam.Questions)
             .HasForeignKey(courseExamQuestion => courseExamQuestion.ExamId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         #endregion
     }

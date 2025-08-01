@@ -26,7 +26,7 @@ public class CourseCategoryConfiguration : IEntityTypeConfiguration<CourseCatego
         builder.HasOne<Course>()
             .WithMany(course => course.Categories)
             .HasForeignKey(courseCategory => courseCategory.CourseId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne<Category>()
             .WithMany()

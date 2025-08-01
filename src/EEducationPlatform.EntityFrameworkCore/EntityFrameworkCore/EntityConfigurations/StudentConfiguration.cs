@@ -1,8 +1,8 @@
 ﻿using EEducationPlatform.Aggregates.Courses;
+using EEducationPlatform.Aggregates.Persons;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Volo.Abp.EntityFrameworkCore.Modeling;
-using Volo.Abp.Identity;
 
 namespace EEducationPlatform.EntityFrameworkCore.EntityConfigurations;
 
@@ -25,11 +25,11 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
         builder.HasOne<Course>()
             .WithMany(course => course.Students)
             .HasForeignKey(courseStudent => courseStudent.CourseId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<IdentityUser>()
+        builder.HasOne<Person>()
             .WithMany()
-            .HasForeignKey(courseStudent => courseStudent.UserId)
+            .HasForeignKey(person => person.PersonId)
             .OnDelete(DeleteBehavior.Restrict);
 
         #endregion

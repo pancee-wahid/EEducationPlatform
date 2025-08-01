@@ -26,12 +26,12 @@ public class SubmissionConfiguration : IEntityTypeConfiguration<Submission>
         builder.HasOne<Exam>()
             .WithMany(exam => exam.Submissions)
             .HasForeignKey(submission => submission.ExamId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne<Student>()
             .WithMany()
             .HasForeignKey(submission => submission.StudentId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         #endregion
     }

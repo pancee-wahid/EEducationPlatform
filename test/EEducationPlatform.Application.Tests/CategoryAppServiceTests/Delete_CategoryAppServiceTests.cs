@@ -79,8 +79,10 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
         var firstSubCategoryId = await _categoryAppService.CreateAsync(_secondCreateCategoryDto);
         
         //Act && Assert
-        await Assert.ThrowsAsync<BusinessException>(() => 
+        var exception = await Assert.ThrowsAsync<BusinessException>(() => 
             _categoryAppService.DeleteAsync(parentCategoryId)
         );
+        
+        exception.Code.ShouldBe(EEducationPlatformDomainErrorCodes.CategoryHasSubCategories);
     }
 }

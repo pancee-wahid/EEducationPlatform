@@ -27,7 +27,7 @@ public class LectureConfiguration : IEntityTypeConfiguration<Lecture>
         builder.HasOne<Course>()
             .WithMany(course => course.Lectures)
             .HasForeignKey(courseLecture => courseLecture.CourseId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         #endregion
     }

@@ -106,10 +106,6 @@ namespace EEducationPlatform.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
 
-                    b.Property<string>("Bio")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
                     b.Property<Guid>("CourseId")
                         .HasColumnType("char(36)");
 
@@ -129,10 +125,6 @@ namespace EEducationPlatform.Migrations
                         .HasColumnType("datetime(6)")
                         .HasColumnName("DeletionTime");
 
-                    b.Property<string>("Experience")
-                        .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
-
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
@@ -147,14 +139,14 @@ namespace EEducationPlatform.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("LastModifierId");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("PersonId")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("PersonId");
 
                     b.ToTable("Admin", (string)null);
                 });
@@ -258,6 +250,9 @@ namespace EEducationPlatform.Migrations
                         .HasColumnType("longtext")
                         .HasColumnName("ExtraProperties");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
@@ -279,6 +274,9 @@ namespace EEducationPlatform.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
+
+                    b.Property<bool>("NeedsEnrollmentApproval")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<float?>("SubscriptionFees")
                         .HasColumnType("float");
@@ -309,6 +307,20 @@ namespace EEducationPlatform.Migrations
                     b.Property<Guid?>("CreatorId")
                         .HasColumnType("char(36)")
                         .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
 
                     b.Property<DateTime?>("LastModificationTime")
                         .HasColumnType("datetime(6)")
@@ -401,6 +413,13 @@ namespace EEducationPlatform.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
                     b.Property<Guid>("CourseId")
                         .HasColumnType("char(36)");
 
@@ -423,6 +442,11 @@ namespace EEducationPlatform.Migrations
                     b.Property<string>("Description")
                         .HasMaxLength(500)
                         .HasColumnType("varchar(500)");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
 
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
@@ -507,14 +531,14 @@ namespace EEducationPlatform.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("LastModifierId");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("PersonId")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("PersonId");
 
                     b.ToTable("Instructor", (string)null);
                 });
@@ -693,20 +717,17 @@ namespace EEducationPlatform.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("LastModifierId");
 
-                    b.Property<bool>("NeedsEnrollmentApproval")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("char(36)");
 
                     b.Property<float>("Score")
                         .HasColumnType("float");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("PersonId");
 
                     b.ToTable("Student", (string)null);
                 });
@@ -963,6 +984,91 @@ namespace EEducationPlatform.Migrations
                     b.HasIndex("LookupTypeId");
 
                     b.ToTable("LookupValue", (string)null);
+                });
+
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Persons.Person", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<string>("FirstNameAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("FirstNameEn")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("FullNameAr")
+                        .HasMaxLength(250)
+                        .HasColumnType("varchar(250)");
+
+                    b.Property<string>("FullNameEn")
+                        .HasMaxLength(250)
+                        .HasColumnType("varchar(250)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<string>("LastNameAr")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("LastNameEn")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Person", (string)null);
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>
@@ -2789,7 +2895,7 @@ namespace EEducationPlatform.Migrations
             modelBuilder.Entity("EEducationPlatform.Aggregates.Categories.Category", b =>
                 {
                     b.HasOne("EEducationPlatform.Aggregates.Categories.Category", null)
-                        .WithMany("Categories")
+                        .WithMany("SubCategories")
                         .HasForeignKey("ParentCategoryId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
@@ -2799,12 +2905,12 @@ namespace EEducationPlatform.Migrations
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
                         .WithMany("Admins")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Volo.Abp.Identity.IdentityUser", null)
+                    b.HasOne("EEducationPlatform.Aggregates.Persons.Person", null)
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -2814,7 +2920,7 @@ namespace EEducationPlatform.Migrations
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Question", null)
                         .WithMany("Choices")
                         .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -2829,7 +2935,7 @@ namespace EEducationPlatform.Migrations
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
                         .WithMany("Categories")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -2838,13 +2944,13 @@ namespace EEducationPlatform.Migrations
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
                         .WithMany("Documents")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Lecture", null)
                         .WithMany()
                         .HasForeignKey("LectureId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Exam", b =>
@@ -2852,13 +2958,13 @@ namespace EEducationPlatform.Migrations
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
                         .WithMany("Exams")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Lecture", null)
                         .WithMany()
                         .HasForeignKey("LectureId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Instructor", b =>
@@ -2866,12 +2972,12 @@ namespace EEducationPlatform.Migrations
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
                         .WithMany("Instructors")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Volo.Abp.Identity.IdentityUser", null)
+                    b.HasOne("EEducationPlatform.Aggregates.Persons.Person", null)
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -2881,7 +2987,7 @@ namespace EEducationPlatform.Migrations
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
                         .WithMany("Lectures")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -2890,7 +2996,7 @@ namespace EEducationPlatform.Migrations
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Exam", null)
                         .WithMany("Questions")
                         .HasForeignKey("ExamId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -2899,12 +3005,12 @@ namespace EEducationPlatform.Migrations
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Course", null)
                         .WithMany("Students")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Volo.Abp.Identity.IdentityUser", null)
+                    b.HasOne("EEducationPlatform.Aggregates.Persons.Person", null)
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -2914,13 +3020,13 @@ namespace EEducationPlatform.Migrations
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Question", null)
                         .WithMany()
                         .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Submission", null)
                         .WithMany("Answers")
                         .HasForeignKey("SubmissionId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -2929,13 +3035,13 @@ namespace EEducationPlatform.Migrations
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Exam", null)
                         .WithMany("Submissions")
                         .HasForeignKey("ExamId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("EEducationPlatform.Aggregates.Courses.Student", null)
                         .WithMany()
                         .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -2944,6 +3050,15 @@ namespace EEducationPlatform.Migrations
                     b.HasOne("EEducationPlatform.Aggregates.LookupTypes.LookupType", null)
                         .WithMany("LookupValues")
                         .HasForeignKey("LookupTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("EEducationPlatform.Aggregates.Persons.Person", b =>
+                {
+                    b.HasOne("Volo.Abp.Identity.IdentityUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
@@ -3101,7 +3216,7 @@ namespace EEducationPlatform.Migrations
 
             modelBuilder.Entity("EEducationPlatform.Aggregates.Categories.Category", b =>
                 {
-                    b.Navigation("Categories");
+                    b.Navigation("SubCategories");
                 });
 
             modelBuilder.Entity("EEducationPlatform.Aggregates.Courses.Course", b =>

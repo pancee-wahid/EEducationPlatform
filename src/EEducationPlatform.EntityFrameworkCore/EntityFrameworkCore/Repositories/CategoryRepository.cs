@@ -19,13 +19,13 @@ public class CategoryRepository : EfCoreRepository<EEducationPlatformDbContext, 
 
     public async Task<Category> GetCategoryDetailsAsync(Guid id, int maxDepth = 1)
     {
-        var dbContext = await GetDbContextAsync();
-        
-        var query = dbContext.Set<Category>().AsQueryable();
-        
+        var dbSet = await GetDbSetAsync();
+
+        var query = dbSet.AsQueryable();
+
         if (maxDepth > 0)
-            query = dbContext.Set<Category>().AsQueryable().Include(x => x.SubCategories);
-        
+            query = dbSet.Include(x => x.SubCategories);
+
         var category = await query
                            .FirstOrDefaultAsync(x => x.Id == id)
                        ?? throw new EntityNotFoundException(typeof(Category), id);
@@ -41,10 +41,53 @@ public class CategoryRepository : EfCoreRepository<EEducationPlatformDbContext, 
             }
 
             if (nextCategories.IsNullOrEmpty()) break;
-            
+
             currentCategories = nextCategories;
         }
 
         return category;
+    }
+
+    public async Task<Category?> GetCategoryByCodeAsync(string code)
+    {
+        var dbSet = await GetDbSetAsync();
+        return await dbSet.FirstOrDefaultAsync(x => x.Code == code);
+    }
+
+    public async Task<List<Category>> GetListAsync(string? filter, int maxResultCount, int skipCount,
+        string sorting = "Name", bool parentsOnly = false)
+    {
+        var dbSet = await GetDbSetAsync();
+
+        var query = dbSet
+            .WhereIf(
+                parentsOnly,
+                category => category.ParentCategoryId == Guid.Empty || category.ParentCategoryId == null
+            )
+            .WhereIf(
+                !filter.IsNullOrWhiteSpace(),
+                category => category.Name.ToLower().Contains(filter!.ToLower())
+                            || category.Code.ToLower().Contains(filter!.ToLower())
+                            || (category.Description ?? "").ToLower().Contains(filter!.ToLower())
+                            || category.Id.ToString().ToLower().Contains(filter!.ToLower())
+            )
+            .OrderBy(x => sorting.ToLower().Equals("code") ? x.Code.ToLower() : x.Name.ToLower())
+            .Skip(skipCount)
+            .Take(maxResultCount);
+
+        return await query
+            .ToListAsync();
+    }
+
+    public async Task<List<Guid>> GetUnfoundCategoriesIds(List<Guid> categoriesIds)
+    {
+        var dbSet = await GetDbSetAsync();
+
+        var foundCategories = dbSet
+            .Where(c => categoriesIds.Contains(c.Id))
+            .Select(c => c.Id)
+            .ToList();
+
+        return categoriesIds.Where(c => !foundCategories.Contains(c)).ToList();
     }
 }

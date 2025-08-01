@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using EEducationPlatform.Aggregates.Categories;
 using EEducationPlatform.Categories.Dtos;
+using EEducationPlatform.Categories.Events;
+using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
-using Volo.Abp.ObjectMapping;
-using Volo.Abp.Validation;
+using Volo.Abp.EventBus.Local;
 
 namespace EEducationPlatform.Categories;
 
@@ -14,42 +14,88 @@ public class CategoryAppService: ApplicationService, ICategoryAppService
 {
     private readonly CategoryManager _categoryManager;
     private readonly ICategoryRepository _categoryRepository;
-    public CategoryAppService(CategoryManager categoryManager, ICategoryRepository categoryRepository)
+    private readonly ILocalEventBus _localEventBus;
+    
+    public CategoryAppService(CategoryManager categoryManager, ICategoryRepository categoryRepository,
+        ILocalEventBus localEventBus)
     {
         _categoryManager = categoryManager;
         _categoryRepository = categoryRepository;
+        _localEventBus = localEventBus;
     }
     
     // all methods are virtual as FluentValidation doesn't work automatically while using Conventional Controllers
     // unless methods are all virtual
     // in case of switching to custom controllers, as we use dependency injection and inject IXAppService to it,
     // we can remove virtual from methods here
-    public virtual async Task<Guid> CreateAsync(CreateCategoryDto createCategoryDto)
+    public virtual async Task<Guid> CreateAsync(CreateCategoryDto dto)
     {
-        var category = ObjectMapper.Map<CreateCategoryDto, Category>(createCategoryDto);
+        var mappedCategory = ObjectMapper.Map<CreateCategoryDto, Category>(dto);
         
-        var result = await _categoryManager.CreateAsync(category);
+        var createdCategory = await _categoryManager.CreateAsync(mappedCategory);
         
-        return result.Id;
+        await _localEventBus.PublishAsync(new CategoryCreatedEto
+        {
+            Id = createdCategory.Id,
+            Name = createdCategory.Name,
+            Code = createdCategory.Code,
+            ParentCategoryId = createdCategory.ParentCategoryId
+        });
+        
+        return createdCategory.Id;
     }
 
-    public virtual async Task UpdateAsync(Guid id, UpdateCategoryDto updateCategoryDto)
+    public virtual async Task UpdateAsync(Guid id, UpdateCategoryDto dto)
     {
-        updateCategoryDto.Id = id;
-        var updatedCategory = ObjectMapper.Map<UpdateCategoryDto, Category>(updateCategoryDto);
+        var updatedCategory = ObjectMapper.Map<UpdateCategoryDto, Category>(dto);
         
-        await _categoryManager.UpdateCategory(updatedCategory);    
+        await _categoryManager.UpdateCategory(id, updatedCategory);    
+        
+        await _localEventBus.PublishAsync(new CategoryCreatedEto
+        {
+            Id = id,
+            Name = updatedCategory.Name,
+            Code = updatedCategory.Code,
+            ParentCategoryId = updatedCategory.ParentCategoryId
+        });
     }
 
     public virtual async Task DeleteAsync(Guid id)
     {
         await _categoryManager.DeleteCategoryAsync(id);
+        
+        await _localEventBus.PublishAsync(new CategoryDeletedEto
+        {
+            Id = id
+        });
     }
 
-    public virtual async Task<CategoryDto> GetAsync(Guid id, GetCategoryQueryDto queryDto)
+    /// <summary>
+    /// Retrieves a specific category with its children and grandchildren to the specified depth in the request, or depth 1 as default.
+    /// </summary>
+    public virtual async Task<SpecificCategoryDto> GetAsync(Guid id, GetCategoryQueryDto queryDto)
     {
         var category = await _categoryRepository.GetCategoryDetailsAsync(id, queryDto.MaxDepth);
 
-        return ObjectMapper.Map<Category, CategoryDto>(category); 
+        return ObjectMapper.Map<Category, SpecificCategoryDto>(category); 
+    }
+    
+    public virtual async Task<PagedResultDto<CategoryDto>> GetListAsync(GetCategoriesQueryDto queryDto)
+    {
+        var categories = await _categoryRepository.GetListAsync(
+            queryDto.Filter,
+            queryDto.MaxResultCount,
+            queryDto.SkipCount,
+            queryDto.Sorting ?? "Name",
+            queryDto.ParentsOnly
+        );
+        
+        var categoryDtos = ObjectMapper.Map<List<Category>, List<CategoryDto>>(categories);
+
+        return new PagedResultDto<CategoryDto>
+        {
+            TotalCount = categories.Count,
+            Items = categoryDtos
+        };
     }
 }

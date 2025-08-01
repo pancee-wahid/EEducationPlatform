@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Linq;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.Guids;
 
 namespace EEducationPlatform.Aggregates.Courses;
 
@@ -14,45 +14,63 @@ public class Course : FullAuditedAggregateRoot<Guid>
     public string? Description { get; private set; }
     public bool IsPaid { get; private set; }
     public float? SubscriptionFees { get; private set; } // null only when IsPaid is false
+    public bool IsActive { get; private set; } 
+    public bool NeedsEnrollmentApproval { get; private set; }
 
-    private readonly List<CourseCategory> _categories;
+    private readonly List<CourseCategory> _categories = [];
     public IEnumerable<CourseCategory> Categories => _categories.AsReadOnly();
 
-    private readonly List<Instructor> _instructors;
+    private readonly List<Instructor> _instructors = [];
     public IEnumerable<Instructor> Instructors => _instructors.AsReadOnly();
 
-    private readonly List<Admin> _admins;
+    private readonly List<Admin> _admins = [];
     public IEnumerable<Admin> Admins => _admins.AsReadOnly();
 
-    private readonly List<Student> _students;
+    private readonly List<Student> _students = [];
     public IEnumerable<Student> Students => _students.AsReadOnly();
 
-    private readonly List<Lecture> _lectures;
+    private readonly List<Lecture> _lectures = [];
     public IEnumerable<Lecture> Lectures => _lectures.AsReadOnly();
 
-    private readonly List<Document> _documents;
+    private readonly List<Document> _documents = [];
     public IEnumerable<Document> Documents => _documents.AsReadOnly();
-    
-    private readonly List<Exam> _exams;
+
+    private readonly List<Exam> _exams = [];
     public IEnumerable<Exam> Exams => _exams.AsReadOnly();
+
+    protected Course() {}
     
     public Course(Guid id, string name, string code, string? description, bool isPaid,
-        float? subscriptionFees) : base(id)
+        float? subscriptionFees, bool needsEnrollmentApproval) : base(id)
     {
         Name = name;
         Code = code;
         Description = description;
         IsPaid = isPaid;
         SubscriptionFees = subscriptionFees;
-        _categories = [];
-        _instructors = [];
-        _admins = [];
-        _students = [];
-        _lectures = [];
-        _documents = [];
-        _exams = [];
+        IsActive = true; // course is created active initially
+        NeedsEnrollmentApproval = needsEnrollmentApproval;
     }
 
+    public Course Activate(bool isActive)
+    {
+        IsActive = isActive;
+        
+        return this;
+    }
+
+    public Course UpdateCourseInfo(string name, string code, string? description, bool isPaid, float? subscriptionFees, bool needsEnrollmentApproval)
+    {
+        Name = name;
+        Code = code;
+        Description = description;
+        IsPaid = isPaid;
+        SubscriptionFees = subscriptionFees;
+        NeedsEnrollmentApproval = needsEnrollmentApproval;
+        
+        return this;
+    }
+    
     #region Course category
 
     public void AddCourseCategory(Guid id, Guid categoryId)
@@ -64,7 +82,23 @@ public class Course : FullAuditedAggregateRoot<Guid>
         );
     }
 
-    public void RemoveCourseCategories(IEnumerable<CourseCategory> courseCategories)
+    public void UpdateAllCourseCategories(IGuidGenerator guidGenerator, List<CourseCategory> updatedCourseCategories)
+    {
+        var categoriesToRemove = _categories.Where(c => 
+            updatedCourseCategories.All(uc => uc.CategoryId != c.CategoryId)).ToList();
+        
+        RemoveCourseCategories(categoriesToRemove);
+
+        var categoriesToAdd = updatedCourseCategories.Where(uc => 
+            _categories.All(c => c.CategoryId != uc.CategoryId)).ToList();
+
+        foreach (var courseCategory in categoriesToAdd)
+        {
+            AddCourseCategory(guidGenerator.Create(), courseCategory.CategoryId);
+        }
+    }
+
+    public void RemoveCourseCategories(List<CourseCategory> courseCategories)
     {
         _categories.RemoveAll(courseCategories);
     }
@@ -73,30 +107,30 @@ public class Course : FullAuditedAggregateRoot<Guid>
 
     #region Course instructor
 
-    public void AddInstructor(Guid id, Guid userId, Guid courseId, string? experience, string? bio)
+    public void AddInstructor(IGuidGenerator guidGenerator, Guid userId, Guid courseId, string? experience, string? bio)
     {
         _instructors.Add(new Instructor(
-            id: id,
-            userId: userId,
+            id: guidGenerator.Create(),
+            personId: userId,
             courseId: courseId,
             experience: experience,
             bio: bio
         ));
     }
 
-    public void UpdateInstructor(Instructor updatedInstructor)
+    public void UpdateInstructor(Guid id, string? experience, string? bio)
     {
-        var courseLecturer = _instructors.Find(l => l.Id == updatedInstructor.Id)
+        var instructor = _instructors.Find(l => l.Id == id)
                              ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
                                  .WithData("EntityName", nameof(Instructor))
-                                 .WithData("Id", updatedInstructor.Id.ToString());
+                                 .WithData("Id", id.ToString());
 
-        courseLecturer.Update(
-            experience: updatedInstructor.Experience,
-            bio: updatedInstructor.Bio
+        instructor.Update(
+            experience: experience,
+            bio: bio
         );
     }
-
+    
     public void RemoveInstructors(IEnumerable<Instructor> instructors)
     {
         _instructors.RemoveAll(instructors);
@@ -106,31 +140,16 @@ public class Course : FullAuditedAggregateRoot<Guid>
 
     #region Course admin
 
-    public void AddAdmin(Guid id, Guid userId, Guid courseId, string? experience, string? bio)
+    public void AddAdmin(IGuidGenerator guidGenerator, Guid userId, Guid courseId)
     {
         _admins.Add(new Admin(
-            id: id,
-            userId: userId,
-            courseId: courseId,
-            experience: experience,
-            bio: bio
+            id: guidGenerator.Create(),
+            personId: userId,
+            courseId: courseId
         ));
     }
-
-    public void UpdateAdmin(Admin updatedAdmin)
-    {
-        var admin = _admins.Find(l => l.Id == updatedAdmin.Id)
-                          ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
-                              .WithData("EntityName", nameof(Admin))
-                              .WithData("Id", updatedAdmin.Id.ToString());
-
-        admin.Update(
-            experience: updatedAdmin.Experience,
-            bio: updatedAdmin.Bio
-        );
-    }
-
-    public void RemoveAdmins(IEnumerable<Admin> admins)
+    
+    public void RemoveAdmins(List<Admin> admins)
     {
         _admins.RemoveAll(admins);
     }
@@ -139,34 +158,33 @@ public class Course : FullAuditedAggregateRoot<Guid>
 
     #region Course student
 
-    public void AddStudent(Guid id, Guid userId, Guid courseId, DateTime enrollmentDate, float score, bool needsEnrollmentApproval, bool isEnrollmentApproved, bool isActive)
+    public void AddStudent(IGuidGenerator guidGenerator, Guid userId, Guid courseId, DateTime enrollmentDate,
+        float score, bool isEnrollmentApproved, bool isActive)
     {
         _students.Add(new Student(
-            id: id,
-            userId: userId,
+            id: guidGenerator.Create(),
+            personId: userId,
             courseId: courseId,
             enrollmentDate: enrollmentDate,
-            score: score, 
-            needsEnrollmentApproval: needsEnrollmentApproval, 
-            isEnrollmentApproved: isEnrollmentApproved, 
+            score: score,
+            isEnrollmentApproved: isEnrollmentApproved,
             isActive: isActive));
     }
 
     public void UpdateStudent(Student updatedStudent)
     {
         var student = _students.Find(l => l.Id == updatedStudent.Id)
-                            ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
-                                .WithData("EntityName", nameof(Student))
-                                .WithData("Id", updatedStudent.Id.ToString());
+                      ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
+                          .WithData("EntityName", nameof(Student))
+                          .WithData("Id", updatedStudent.Id.ToString());
 
         student.Update(
             score: updatedStudent.Score,
-            needsEnrollmentApproval: updatedStudent.NeedsEnrollmentApproval,
             isEnrollmentApproved: updatedStudent.IsEnrollmentApproved,
             isActive: updatedStudent.IsActive);
     }
 
-    public void RemoveStudents(IEnumerable<Student> students)
+    public void RemoveStudents(List<Student> students)
     {
         _students.RemoveAll(students);
     }
@@ -175,10 +193,11 @@ public class Course : FullAuditedAggregateRoot<Guid>
 
     #region Course lecture
 
-    public void AddLecture(Guid id, string name, string? description, int? length, DateTime? publishDate,
-        string? youtubeLink)
+    public void AddLecture(IGuidGenerator guidGenerator, string name, string? description, int? length,
+        DateTime? publishDate, string? youtubeLink)
     {
-        _lectures.Add(new(id: id,
+        _lectures.Add(new Lecture(
+            id: guidGenerator.Create(),
             name: name,
             description: description,
             courseId: this.Id,
@@ -203,7 +222,7 @@ public class Course : FullAuditedAggregateRoot<Guid>
             youtubeLink: updatedLecture.YoutubeLink);
     }
 
-    public void RemoveLectures(IEnumerable<Lecture> lectures)
+    public void RemoveLectures(List<Lecture> lectures)
     {
         _lectures.RemoveAll(lectures);
     }
@@ -212,11 +231,11 @@ public class Course : FullAuditedAggregateRoot<Guid>
 
     #region Course document
 
-    public void AddDocument(Guid id, string name, DocumentType type, Guid lectureId, string path, int size,
-        int pagesCount)
+    public void AddDocument(IGuidGenerator guidGenerator, string name, DocumentType type, Guid lectureId, string path,
+        int size, int pagesCount)
     {
         _documents.Add(new Document(
-            id: id,
+            id: guidGenerator.Create(),
             name: name,
             type: type,
             courseId: this.Id,
@@ -227,41 +246,61 @@ public class Course : FullAuditedAggregateRoot<Guid>
         ));
     }
 
-    public void RemoveDocuments(IEnumerable<Document> documents)
+    public void RemoveDocuments(List<Document> documents)
     {
         _documents.RemoveAll(documents);
     }
 
     #endregion
-    
+
     #region Course exam
 
-    public void AddExam(Guid id, string name, string? description, Guid? lectureId, ExamType type, float score)
+    public void AddExam(IGuidGenerator guidGenerator, string name, string? description, Guid? lectureId, ExamType type,
+        float score, List<Question> questions)
     {
-        _exams.Add(new Exam(
-            id: id,
-            name: name, 
-            description: description,  
-            courseId: this.Id, 
+        var newExam = new Exam(
+            id: guidGenerator.Create(),
+            name: name,
+            description: description,
+            courseId: this.Id,
             lectureId: lectureId,
             type: type,
             score: score
-        ));
+        );
+
+        foreach (var question in questions)
+        {
+            newExam.AddQuestion(
+                guidGenerator: guidGenerator,
+                examId: newExam.Id,
+                content: question.Content,
+                type: question.Type,
+                correctAnswer: question.CorrectAnswer,
+                needsManualChecking: question.NeedsManualChecking,
+                score: question.Score,
+                choices:  question.Choices.ToList()
+            );
+        }
+        
+        _exams.Add(newExam);
     }
 
-    public void UpdateExam(Exam updatedExam)
+    public void UpdateExam(IGuidGenerator guidGenerator, Exam updatedExam)
     {
         var exam = _exams.Find(l => l.Id == updatedExam.Id)
-                             ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
-                                 .WithData("EntityName", nameof(Exam))
-                                 .WithData("Id", updatedExam.Id.ToString());
+                   ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
+                       .WithData("EntityName", nameof(Exam))
+                       .WithData("Id", updatedExam.Id.ToString());
 
         exam.Update(
+            guidGenerator: guidGenerator,
             name: updatedExam.Name,
             description: updatedExam.Description,
             type: updatedExam.Type,
-            score: updatedExam.Score
+            score: updatedExam.Score,
+            questions: updatedExam.Questions.ToList()
         );
+        
     }
 
     public void RemoveExams(IEnumerable<Exam> exams)

@@ -1,3 +1,4 @@
+using EEducationPlatform.Aggregates.Categories;
 using EEducationPlatform.Categories;
 using EEducationPlatform.Categories.Dtos;
 using Volo.Abp.Modularity;

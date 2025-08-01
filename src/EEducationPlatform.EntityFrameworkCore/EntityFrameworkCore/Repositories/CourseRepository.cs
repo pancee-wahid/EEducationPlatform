@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using EEducationPlatform.Aggregates.Courses;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,12 +16,31 @@ public class CourseRepository : EfCoreRepository<EEducationPlatformDbContext, Co
     {
 
     }
+    
+    public async Task<Course?> GetCourseByCodeAsync(string code)
+    {
+        var dbSet = await GetDbSetAsync();
+        return await dbSet.FirstOrDefaultAsync(c => c.Code == code);
+    }
 
-    // public async Task<Person> FindByNameAsync(string name)
-    // {
-    //     var dbContext = await GetDbContextAsync();
-    //     return await dbContext.Set<Person>()
-    //         .Where(p => p.Name == name)
-    //         .FirstOrDefaultAsync();
-    // }
+    public async Task<List<Course>> GetCoursesByCategoryIdAsync(Guid categoryId)
+    {
+        var dbSet = await GetDbSetAsync();
+        return await dbSet
+            .Include(course => course.Categories)
+            .Where(course => 
+                course.Categories.Any(courseCategory => courseCategory.CategoryId == categoryId))
+            .ToListAsync();
+    }
+    
+    public async Task<bool> AreAnyCoursesBelongToCategory(Guid categoryId)
+    {
+        var dbContext = await GetDbContextAsync();
+        var query = from course in dbContext.Set<Course>()
+            join courseCategory in dbContext.Set<CourseCategory>() on course.Id equals courseCategory.CourseId
+            where courseCategory.CategoryId == categoryId
+            select course;
+        
+        return await query.AnyAsync();
+    }
 }
