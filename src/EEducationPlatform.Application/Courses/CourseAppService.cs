@@ -30,4 +30,17 @@ public class CourseAppService : ApplicationService, ICourseAppService
         
         await _courseManager.UpdateAsync(id, updatedCourse);
     }
+    
+    [HttpPut]
+    public virtual async Task ActivateAsync(Guid id)
+    {
+        await _courseManager.ActivateAsync(id, true);
+        
+    }
+    
+    [HttpPut]
+    public virtual async Task DeactivateAsync(Guid id)
+    {
+        await _courseManager.ActivateAsync(id, false);
+    }
 }

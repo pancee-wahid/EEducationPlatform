@@ -14,7 +14,7 @@ public class Course : FullAuditedAggregateRoot<Guid>
     public string? Description { get; private set; }
     public bool IsPaid { get; private set; }
     public float? SubscriptionFees { get; private set; } // null only when IsPaid is false
-    public bool IsActive { get; private set; } 
+    public bool IsActive { get; private set; }
     public bool NeedsEnrollmentApproval { get; private set; }
 
     private readonly List<CourseCategory> _categories = [];
@@ -38,8 +38,10 @@ public class Course : FullAuditedAggregateRoot<Guid>
     private readonly List<Exam> _exams = [];
     public IEnumerable<Exam> Exams => _exams.AsReadOnly();
 
-    protected Course() {}
-    
+    protected Course()
+    {
+    }
+
     public Course(Guid id, string name, string code, string? description, bool isPaid,
         float? subscriptionFees, bool needsEnrollmentApproval) : base(id)
     {
@@ -55,11 +57,12 @@ public class Course : FullAuditedAggregateRoot<Guid>
     public Course Activate(bool isActive)
     {
         IsActive = isActive;
-        
+
         return this;
     }
 
-    public Course UpdateCourseInfo(string name, string code, string? description, bool isPaid, float? subscriptionFees, bool needsEnrollmentApproval)
+    public Course UpdateCourseInfo(string name, string code, string? description, bool isPaid, float? subscriptionFees,
+        bool needsEnrollmentApproval)
     {
         Name = name;
         Code = code;
@@ -67,10 +70,10 @@ public class Course : FullAuditedAggregateRoot<Guid>
         IsPaid = isPaid;
         SubscriptionFees = subscriptionFees;
         NeedsEnrollmentApproval = needsEnrollmentApproval;
-        
+
         return this;
     }
-    
+
     #region Course category
 
     public void AddCourseCategory(Guid id, Guid categoryId)
@@ -84,12 +87,12 @@ public class Course : FullAuditedAggregateRoot<Guid>
 
     public void UpdateAllCourseCategories(IGuidGenerator guidGenerator, List<CourseCategory> updatedCourseCategories)
     {
-        var categoriesToRemove = _categories.Where(c => 
+        var categoriesToRemove = _categories.Where(c =>
             updatedCourseCategories.All(uc => uc.CategoryId != c.CategoryId)).ToList();
-        
+
         RemoveCourseCategories(categoriesToRemove);
 
-        var categoriesToAdd = updatedCourseCategories.Where(uc => 
+        var categoriesToAdd = updatedCourseCategories.Where(uc =>
             _categories.All(c => c.CategoryId != uc.CategoryId)).ToList();
 
         foreach (var courseCategory in categoriesToAdd)
@@ -107,12 +110,12 @@ public class Course : FullAuditedAggregateRoot<Guid>
 
     #region Course instructor
 
-    public void AddInstructor(IGuidGenerator guidGenerator, Guid userId, Guid courseId, string? experience, string? bio)
+    public void AddInstructor(IGuidGenerator guidGenerator, Guid userId, string? experience, string? bio)
     {
         _instructors.Add(new Instructor(
             id: guidGenerator.Create(),
             personId: userId,
-            courseId: courseId,
+            courseId: this.Id,
             experience: experience,
             bio: bio
         ));
@@ -121,16 +124,16 @@ public class Course : FullAuditedAggregateRoot<Guid>
     public void UpdateInstructor(Guid id, string? experience, string? bio)
     {
         var instructor = _instructors.Find(l => l.Id == id)
-                             ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
-                                 .WithData("EntityName", nameof(Instructor))
-                                 .WithData("Id", id.ToString());
+                         ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.EntityToUpdateIsNotFound)
+                             .WithData("EntityName", nameof(Instructor))
+                             .WithData("Id", id.ToString());
 
         instructor.Update(
             experience: experience,
             bio: bio
         );
     }
-    
+
     public void RemoveInstructors(IEnumerable<Instructor> instructors)
     {
         _instructors.RemoveAll(instructors);
@@ -140,15 +143,15 @@ public class Course : FullAuditedAggregateRoot<Guid>
 
     #region Course admin
 
-    public void AddAdmin(IGuidGenerator guidGenerator, Guid userId, Guid courseId)
+    public void AddAdmin(IGuidGenerator guidGenerator, Guid personId)
     {
         _admins.Add(new Admin(
             id: guidGenerator.Create(),
-            personId: userId,
-            courseId: courseId
+            personId: personId,
+            courseId: this.Id
         ));
     }
-    
+
     public void RemoveAdmins(List<Admin> admins)
     {
         _admins.RemoveAll(admins);
@@ -158,13 +161,13 @@ public class Course : FullAuditedAggregateRoot<Guid>
 
     #region Course student
 
-    public void AddStudent(IGuidGenerator guidGenerator, Guid userId, Guid courseId, DateTime enrollmentDate,
+    public void AddStudent(IGuidGenerator guidGenerator, Guid userId, DateTime enrollmentDate,
         float score, bool isEnrollmentApproved, bool isActive)
     {
         _students.Add(new Student(
             id: guidGenerator.Create(),
             personId: userId,
-            courseId: courseId,
+            courseId: this.Id,
             enrollmentDate: enrollmentDate,
             score: score,
             isEnrollmentApproved: isEnrollmentApproved,
@@ -278,10 +281,10 @@ public class Course : FullAuditedAggregateRoot<Guid>
                 correctAnswer: question.CorrectAnswer,
                 needsManualChecking: question.NeedsManualChecking,
                 score: question.Score,
-                choices:  question.Choices.ToList()
+                choices: question.Choices.ToList()
             );
         }
-        
+
         _exams.Add(newExam);
     }
 
@@ -300,7 +303,6 @@ public class Course : FullAuditedAggregateRoot<Guid>
             score: updatedExam.Score,
             questions: updatedExam.Questions.ToList()
         );
-        
     }
 
     public void RemoveExams(IEnumerable<Exam> exams)

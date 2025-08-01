@@ -1,4 +1,6 @@
-﻿public enum MainCourseCategory : long
+﻿namespace EEducationPlatform;
+
+public enum MainCourseCategory : long
 {
     Islam = 100,
     Mathematics = 101,
@@ -41,6 +43,6 @@ public enum ExamType : long
 public enum QuestionType : long
 {
     Other = 500,
-    MCQ = 501,
+    Mcq = 501,
     Essay = 502
 }

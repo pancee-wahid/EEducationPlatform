@@ -3,27 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EEducationPlatform.Aggregates.Categories;
+using EEducationPlatform.Aggregates.Persons;
+using EEducationPlatform.Localization;
+using Microsoft.Extensions.Localization;
 using Volo.Abp;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
+using Volo.Abp.Users;
 
 namespace EEducationPlatform.Aggregates.Courses;
 
-public class CourseManager : DomainService
+public class CourseManager(
+    ICourseRepository courseRepository,
+    ICategoryRepository categoryRepository,
+    IStringLocalizer<EEducationPlatformResource> localizer,
+    IPersonRepository personRepository,
+    ICurrentUser currentUser)
+    : DomainService
 {
-    private readonly ICourseRepository _courseRepository;
-    private readonly ICategoryRepository _categoryRepository;
-    
-    public CourseManager(ICourseRepository courseRepository,  ICategoryRepository categoryRepository)
-    {
-        _courseRepository  = courseRepository;
-        _categoryRepository = categoryRepository;
-    }
-
     public async Task<Course> CreateAsync(Course course)
     {
         await ValidateCourseCodeUniqueness(course.Code);
-        
+
         var createdCourse = new Course(
             id: GuidGenerator.Create(),
             name: course.Name,
@@ -33,7 +34,8 @@ public class CourseManager : DomainService
             subscriptionFees: course.SubscriptionFees,
             needsEnrollmentApproval: course.NeedsEnrollmentApproval
         );
-        
+
+        // Add course categories
         if (course.Categories.Any())
         {
             await ValidateCategoriesAreFound(course.Categories.Select(c => c.CategoryId).ToList());
@@ -43,57 +45,78 @@ public class CourseManager : DomainService
         {
             createdCourse.AddCourseCategory(GuidGenerator.Create(), category.CategoryId);
         }
+
+        // Add current user to course admins
+        var person = await personRepository.FindPersonByUserIdAsync(currentUser.GetId())
+            ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.MissingPerson);
         
-        return await _courseRepository.InsertAsync(createdCourse);
+        createdCourse.AddAdmin(GuidGenerator, person.Id);        
+
+        return await courseRepository.InsertAsync(createdCourse);
     }
-    
+
     public async Task UpdateAsync(Guid id, Course updatedCourse)
     {
-        var existingCourse = await _courseRepository.GetAsync(id);
-        await _courseRepository.EnsureCollectionLoadedAsync(existingCourse, c => c.Categories);
-            
+        var existingCourse = await courseRepository.GetAsync(id);
+        await courseRepository.EnsureCollectionLoadedAsync(existingCourse, c => c.Categories);
+
         if (existingCourse.Code != updatedCourse.Code)
         {
             await ValidateCourseCodeUniqueness(updatedCourse.Code);
         }
-        
+
         existingCourse.UpdateCourseInfo(
-            name:  updatedCourse.Name,
-            code:  updatedCourse.Code,
+            name: updatedCourse.Name,
+            code: updatedCourse.Code,
             description: updatedCourse.Description,
             isPaid: updatedCourse.IsPaid,
             subscriptionFees: updatedCourse.SubscriptionFees,
             needsEnrollmentApproval: updatedCourse.NeedsEnrollmentApproval
         );
-        
+
         if (updatedCourse.Categories.Any())
         {
             await ValidateCategoriesAreFound(updatedCourse.Categories.Select(c => c.CategoryId).ToList());
         }
 
         existingCourse.UpdateAllCourseCategories(GuidGenerator, updatedCourse.Categories.ToList());
-        
-        await _courseRepository.UpdateAsync(existingCourse);
+
+        await courseRepository.UpdateAsync(existingCourse);
     }
-    
+
     private async Task ValidateCourseCodeUniqueness(string code)
     {
-        if (await _courseRepository.GetCourseByCodeAsync(code) != null)
+        if (await courseRepository.GetCourseByCodeAsync(code) != null)
         {
             throw new BusinessException(EEducationPlatformDomainErrorCodes.CourseWithSameCodeExists);
-        }    
+        }
     }
 
     private async Task ValidateCategoriesAreFound(List<Guid> categoriesIds)
     {
-        var unfoundCategories = await _categoryRepository.GetUnfoundCategoriesIds(
+        var unfoundCategories = await categoryRepository.GetUnfoundCategoriesIds(
             categoriesIds);
 
         if (!unfoundCategories.IsNullOrEmpty())
         {
-            var unfoundIds = string.Join(", ",  unfoundCategories);
+            var unfoundIds = string.Join(", ", unfoundCategories);
             throw new BusinessException(EEducationPlatformDomainErrorCodes.CategoriesUnfound)
-                .WithData("CategoriesIds",  unfoundIds);
+                .WithData("CategoriesIds", unfoundIds);
         }
+    }
+
+    public async Task ActivateAsync(Guid id, bool activate)
+    {
+        var course = await courseRepository.GetAsync(id, includeDetails: false);
+
+        if (activate == course.IsActive)
+        {
+            throw new BusinessException(EEducationPlatformDomainErrorCodes.AlreadyInSpecifiedActivationState)
+                .WithData("Status", activate ? localizer["Active"] : localizer["Inactive"]);
+        }
+
+        course.Activate(activate);
+
+        await courseRepository.UpdateAsync(course);
     }
 }

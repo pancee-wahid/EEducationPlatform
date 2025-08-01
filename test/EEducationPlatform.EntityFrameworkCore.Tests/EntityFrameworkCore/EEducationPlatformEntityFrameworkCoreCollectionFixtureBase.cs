@@ -1,5 +1,4 @@
-﻿using EEducationPlatform.EntityFrameworkCore;
-using Xunit;
+﻿using Xunit;
 
 namespace EEducationPlatform.EntityFrameworkCore;
 

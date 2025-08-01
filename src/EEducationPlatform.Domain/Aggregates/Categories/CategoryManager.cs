@@ -8,20 +8,12 @@ using Volo.Abp.Domain.Services;
 
 namespace EEducationPlatform.Aggregates.Categories;
 
-public class CategoryManager : DomainService
+public class CategoryManager(ICategoryRepository categoryRepository, ICourseRepository courseRepository)
+    : DomainService
 {
-    private readonly ICategoryRepository _categoryRepository;
-    private readonly ICourseRepository _courseRepository;
-
-    public CategoryManager(ICategoryRepository categoryRepository, ICourseRepository courseRepository)
-    {
-        _categoryRepository = categoryRepository;
-        _courseRepository = courseRepository;
-    }
-
     public async Task<Category> CreateAsync(Category category)
     {
-        if (await _categoryRepository.GetCategoryByCodeAsync(category.Code) != null)
+        if (await categoryRepository.GetCategoryByCodeAsync(category.Code) != null)
         {
             throw new BusinessException(EEducationPlatformDomainErrorCodes.CategoryWithSameCodeExists);
         }
@@ -39,12 +31,12 @@ public class CategoryManager : DomainService
             await UpdateParentOnAddingChild((Guid)createdCategory.ParentCategoryId!);
         }
 
-        return await _categoryRepository.InsertAsync(createdCategory);
+        return await categoryRepository.InsertAsync(createdCategory);
     }
 
     public async Task UpdateCategory(Guid id, Category updatedCategory)
     {
-        var existingCategory = await _categoryRepository.GetAsync(id, false);
+        var existingCategory = await categoryRepository.GetAsync(id, false);
         var oldParentCategoryId = existingCategory.ParentCategoryId;
         var newParentCategoryId = updatedCategory.ParentCategoryId;
 
@@ -69,18 +61,18 @@ public class CategoryManager : DomainService
         }
         // case: null in new and old, no need to handle parents
 
-        await _categoryRepository.UpdateAsync(existingCategory);
+        await categoryRepository.UpdateAsync(existingCategory);
     }
 
     public async Task DeleteCategoryAsync(Guid id)
     {
-        var hasCourses = await _courseRepository.AreAnyCoursesBelongToCategory(id);
+        var hasCourses = await courseRepository.AreAnyCoursesBelongToCategory(id);
         if (hasCourses)
         {
             throw new BusinessException(EEducationPlatformDomainErrorCodes.CategoryHasCourses);
         }
         
-        var category = await _categoryRepository.GetAsync(id, includeDetails: false);
+        var category = await categoryRepository.GetAsync(id, includeDetails: false);
         if (category.HasSubCategories)
         {
             throw new BusinessException(EEducationPlatformDomainErrorCodes.CategoryHasSubCategories);
@@ -88,7 +80,7 @@ public class CategoryManager : DomainService
 
         var parentCategoryId = category.ParentCategoryId;
 
-        await _categoryRepository.DeleteAsync(category);
+        await categoryRepository.DeleteAsync(category);
 
         if (parentCategoryId.HasValue)
         {
@@ -98,22 +90,22 @@ public class CategoryManager : DomainService
 
     private async Task UpdateParentOnRemovingChild(Guid parentCategoryId, Guid subCategoryId)
     {
-        var parentCategory = await _categoryRepository.GetCategoryDetailsAsync((Guid)parentCategoryId!);
+        var parentCategory = await categoryRepository.GetCategoryDetailsAsync(parentCategoryId);
         if (parentCategory.SubCategories.Where(sc => sc.Id != subCategoryId).ToList().IsNullOrEmpty())
         {
             parentCategory.SetHasSubCategories(false);
-            await _categoryRepository.UpdateAsync(parentCategory);
+            await categoryRepository.UpdateAsync(parentCategory);
         }
     }
     
     private async Task UpdateParentOnAddingChild(Guid parentCategoryId)
     {
-        var parentCategory = await _categoryRepository.GetAsync(parentCategoryId, false);
+        var parentCategory = await categoryRepository.GetAsync(parentCategoryId, false);
 
         if (!parentCategory.HasSubCategories)
         {
             parentCategory.SetHasSubCategories(true);
-            await _categoryRepository.UpdateAsync(parentCategory);
+            await categoryRepository.UpdateAsync(parentCategory);
         }
     }
 }

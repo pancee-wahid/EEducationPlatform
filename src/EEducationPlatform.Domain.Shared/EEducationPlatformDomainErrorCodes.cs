@@ -10,5 +10,6 @@ public static class EEducationPlatformDomainErrorCodes
     public const string CourseWithSameCodeExists = "EDU:000005";
     public const string CategoriesUnfound = "EDU:000006";
     public const string CategoryHasCourses = "EDU:000007";
-    
+    public const string AlreadyInSpecifiedActivationState = "EDU:000008";
+    public const string MissingPerson = "EDU:000009";
 }

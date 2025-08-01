@@ -1,6 +1,4 @@
-﻿using EEducationPlatform.Aggregates.Categories;
-using EEducationPlatform.Aggregates.Courses;
-using EEducationPlatform.Aggregates.LookupTypes;
+﻿using EEducationPlatform.Aggregates.LookupTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Volo.Abp.EntityFrameworkCore.Modeling;

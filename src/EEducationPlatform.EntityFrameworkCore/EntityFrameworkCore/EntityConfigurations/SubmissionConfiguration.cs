@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Volo.Abp.EntityFrameworkCore.Modeling;
-using Volo.Abp.Identity;
-using static EEducationPlatform.EEducationPlatformConstants.Validations;
 
 namespace EEducationPlatform.EntityFrameworkCore.EntityConfigurations;
 

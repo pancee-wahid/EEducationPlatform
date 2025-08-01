@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -15,9 +14,11 @@ public class Category : FullAuditedAggregateRoot<Guid>
 
     private readonly List<Category> _subCategories = [];
     public IEnumerable<Category> SubCategories => _subCategories.AsReadOnly();
-    
-    protected Category(){}
-    
+
+    protected Category()
+    {
+    }
+
     public Category(Guid id, string name, string? description, string code, Guid? parentCategoryId,
         bool hasSubCategories = false) : base(id)
     {

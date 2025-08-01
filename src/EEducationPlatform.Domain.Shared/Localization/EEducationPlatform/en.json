@@ -8,12 +8,16 @@
     "EDU:000005": "A course with the same code exists.",
     "EDU:000006": "The following categories are not found: {CategoriesIds}",
     "EDU:000007": "Category can't be deleted as it is assigned to courses.",
+    "EDU:000008": "The course is already {Status}.",
+    "EDU:000009": "Some user info is missing.",
     
     "Validation:MustNotContainWhiteSpace": "Must not contain whitespaces.",
     
     "AppName": "EEducationPlatform",
     "Menu:Home": "Home",
     "LongWelcomeMessage": "Welcome to the application. This is a startup project based on the ABP framework. For more information visit",
-    "Welcome": "Welcome"
+    "Welcome": "Welcome",
+    "Active": "active",
+    "Inactive": "inactive"
   }
 }

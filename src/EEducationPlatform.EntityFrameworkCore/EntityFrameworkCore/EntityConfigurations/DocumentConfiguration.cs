@@ -1,9 +1,7 @@
-﻿using EEducationPlatform.Aggregates.Categories;
-using EEducationPlatform.Aggregates.Courses;
+﻿using EEducationPlatform.Aggregates.Courses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Volo.Abp.EntityFrameworkCore.Modeling;
-using static EEducationPlatform.EEducationPlatformConstants.Validations;
 using static EEducationPlatform.EEducationPlatformConstants.Validations;
 
 namespace EEducationPlatform.EntityFrameworkCore.EntityConfigurations;

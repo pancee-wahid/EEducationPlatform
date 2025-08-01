@@ -1,5 +1,7 @@
 using System;
+using System.Threading.Tasks;
 using EEducationPlatform.Aggregates.Persons;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,5 +14,11 @@ public class PersonRepository: EfCoreRepository<EEducationPlatformDbContext, Per
     {
         
     }
-    
+
+    public async Task<Person?> FindPersonByUserIdAsync(Guid userId)
+    {
+        var dbSet = await GetDbSetAsync();
+
+        return await dbSet.FirstOrDefaultAsync(p => p.UserId == userId);
+    }
 }
