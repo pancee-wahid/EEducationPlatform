@@ -26,12 +26,12 @@ public class ExamConfiguration : IEntityTypeConfiguration<Exam>
         builder.HasOne<Course>()
             .WithMany(course => course.Exams)
             .HasForeignKey(courseExam => courseExam.CourseId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne<Lecture>()
             .WithMany()
             .HasForeignKey(courseExam => courseExam.LectureId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         #endregion
     }

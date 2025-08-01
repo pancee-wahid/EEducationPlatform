@@ -28,7 +28,7 @@ public class InstructorConfiguration : IEntityTypeConfiguration<Instructor>
         builder.HasOne<Course>()
             .WithMany(course => course.Instructors)
             .HasForeignKey(courseInstructor => courseInstructor.CourseId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne<Person>()
             .WithMany()

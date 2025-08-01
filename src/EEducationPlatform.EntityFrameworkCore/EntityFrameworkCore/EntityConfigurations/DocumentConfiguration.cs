@@ -28,12 +28,12 @@ public class DocumentConfiguration : IEntityTypeConfiguration<Document>
         builder.HasOne<Course>()
             .WithMany(course => course.Documents)
             .HasForeignKey(courseDocument => courseDocument.CourseId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne<Lecture>()
             .WithMany()
             .HasForeignKey(courseDocument => courseDocument.LectureId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         #endregion
     }

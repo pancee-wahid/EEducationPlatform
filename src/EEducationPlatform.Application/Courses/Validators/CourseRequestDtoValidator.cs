@@ -26,10 +26,16 @@ public class CourseRequestDtoValidator : AbstractValidator<CourseRequestDto>
             .When(e => !e.Description.IsNullOrEmpty());
 
         RuleFor(e => e.IsPaid).NotNull();
-        
+
         RuleFor(e => e.SubscriptionFees)
-            .NotEmpty()
-            .When(e => e.IsPaid);
+            .NotEmpty();
+        When(e => e.IsPaid, () =>
+        {
+            RuleFor(e => e.SubscriptionFees).NotEmpty();
+        }).Otherwise(() =>
+        {
+            RuleFor(e => e.SubscriptionFees).Empty();
+        });
         
         RuleFor(e => e.NeedsEnrollmentApproval).NotNull();
     }

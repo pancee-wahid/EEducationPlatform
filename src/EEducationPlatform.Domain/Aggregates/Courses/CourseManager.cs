@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using EEducationPlatform.Aggregates.Categories;
 using Volo.Abp;
+using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 
 namespace EEducationPlatform.Aggregates.Courses;
@@ -35,7 +36,7 @@ public class CourseManager : DomainService
         
         if (course.Categories.Any())
         {
-            await ValidateCategoriesAreFound(course.Categories.Select(c => c.Id).ToList());
+            await ValidateCategoriesAreFound(course.Categories.Select(c => c.CategoryId).ToList());
         }
         
         foreach (var category in course.Categories)
@@ -49,7 +50,8 @@ public class CourseManager : DomainService
     public async Task UpdateAsync(Guid id, Course updatedCourse)
     {
         var existingCourse = await _courseRepository.GetAsync(id);
-
+        await _courseRepository.EnsureCollectionLoadedAsync(existingCourse, c => c.Categories);
+            
         if (existingCourse.Code != updatedCourse.Code)
         {
             await ValidateCourseCodeUniqueness(updatedCourse.Code);
@@ -66,7 +68,7 @@ public class CourseManager : DomainService
         
         if (updatedCourse.Categories.Any())
         {
-            await ValidateCategoriesAreFound(updatedCourse.Categories.Select(c => c.Id).ToList());
+            await ValidateCategoriesAreFound(updatedCourse.Categories.Select(c => c.CategoryId).ToList());
         }
 
         existingCourse.UpdateAllCourseCategories(GuidGenerator, updatedCourse.Categories.ToList());

@@ -19,7 +19,7 @@ public class AdminConfiguration : IEntityTypeConfiguration<Admin>
         builder.HasOne<Course>()
             .WithMany(course => course.Admins)
             .HasForeignKey(courseAdmin => courseAdmin.CourseId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne<Person>()
             .WithMany()

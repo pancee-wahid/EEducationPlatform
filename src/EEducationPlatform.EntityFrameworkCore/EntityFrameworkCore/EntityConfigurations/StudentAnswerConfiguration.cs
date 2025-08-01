@@ -25,12 +25,12 @@ public class StudentAnswerConfiguration : IEntityTypeConfiguration<StudentAnswer
         builder.HasOne<Submission>()
             .WithMany(submission => submission.Answers)
             .HasForeignKey(studentAnswer => studentAnswer.SubmissionId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
         
         builder.HasOne<Question>()
             .WithMany()
             .HasForeignKey(studentAnswer => studentAnswer.QuestionId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         #endregion
     }

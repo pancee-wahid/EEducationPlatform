@@ -25,7 +25,7 @@ public class ChoiceConfiguration : IEntityTypeConfiguration<Choice>
         builder.HasOne<Question>()
             .WithMany(question => question.Choices)
             .HasForeignKey(choice => choice.QuestionId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         #endregion
     }
