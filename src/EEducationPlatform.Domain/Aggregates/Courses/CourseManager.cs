@@ -40,7 +40,7 @@ public class CourseManager(
         {
             await ValidateCategoriesAreFound(course.Categories.Select(c => c.CategoryId).ToList());
         }
-        
+
         foreach (var category in course.Categories)
         {
             createdCourse.AddCourseCategory(GuidGenerator.Create(), category.CategoryId);
@@ -48,17 +48,19 @@ public class CourseManager(
 
         // Add current user to course admins
         var person = await personRepository.FindPersonByUserIdAsync(currentUser.GetId())
-            ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.MissingPerson);
-        
-        createdCourse.AddAdmin(GuidGenerator, person.Id);        
+                     ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.MissingPerson);
+
+        createdCourse.AddAdmin(GuidGenerator, person.Id);
 
         return await courseRepository.InsertAsync(createdCourse);
     }
-
+    
     public async Task UpdateAsync(Guid id, Course updatedCourse)
     {
-        var existingCourse = await courseRepository.GetAsync(id);
+        var existingCourse = await courseRepository.GetAsync(id, includeDetails: false);
         await courseRepository.EnsureCollectionLoadedAsync(existingCourse, c => c.Categories);
+        
+        await ValidateCurrentUserIsAdmin(existingCourse);
 
         if (existingCourse.Code != updatedCourse.Code)
         {
@@ -108,6 +110,8 @@ public class CourseManager(
     public async Task ActivateAsync(Guid id, bool activate)
     {
         var course = await courseRepository.GetAsync(id, includeDetails: false);
+        
+        await ValidateCurrentUserIsAdmin(course);
 
         if (activate == course.IsActive)
         {
@@ -118,5 +122,18 @@ public class CourseManager(
         course.Activate(activate);
 
         await courseRepository.UpdateAsync(course);
+    }
+    
+    private async Task ValidateCurrentUserIsAdmin(Course course)
+    {
+        await courseRepository.EnsureCollectionLoadedAsync(course, c => c.Admins);
+
+        var currentPerson = await personRepository.FindPersonByUserIdAsync(currentUser.GetId())
+                            ?? throw new BusinessException(EEducationPlatformDomainErrorCodes.MissingPerson);
+        
+        if (course.Admins.All(a => a.PersonId != currentPerson.Id))
+        {
+            throw new BusinessException(EEducationPlatformDomainErrorCodes.AdminOnlyCanUpdateCourse);
+        }
     }
 }

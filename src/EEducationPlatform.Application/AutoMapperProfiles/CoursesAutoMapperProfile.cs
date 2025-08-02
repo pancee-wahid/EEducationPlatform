@@ -2,6 +2,7 @@ using System;
 using AutoMapper;
 using EEducationPlatform.Aggregates.Courses;
 using EEducationPlatform.Courses.Dtos;
+using EEducationPlatform.ViewModels;
 
 namespace EEducationPlatform.AutoMapperProfiles;
 
@@ -18,5 +19,9 @@ public class CoursesAutoMapperProfile : Profile
                     dest.AddCourseCategory(Guid.Empty, categoryId);
                 }
             });
+
+        CreateMap<CourseViewModel, CourseDto>(MemberList.Destination);
+        CreateMap<CourseCategoryViewModel, CourseCategoryDto>(MemberList.Destination);
+        
     }
 }

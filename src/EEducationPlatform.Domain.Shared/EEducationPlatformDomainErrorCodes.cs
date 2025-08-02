@@ -12,4 +12,5 @@ public static class EEducationPlatformDomainErrorCodes
     public const string CategoryHasCourses = "EDU:000007";
     public const string AlreadyInSpecifiedActivationState = "EDU:000008";
     public const string MissingPerson = "EDU:000009";
+    public const string AdminOnlyCanUpdateCourse = "EDU:000010";
 }
