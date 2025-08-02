@@ -9,6 +9,7 @@ namespace EEducationPlatform.CategoryAppServiceTests;
     where TStartupModule : IAbpModule
 {
     private readonly ICategoryAppService _categoryAppService;
+    private readonly ICategoryRepository _categoryRepository;
     
     private CreateCategoryDto _firstCreateCategoryDto = new CreateCategoryDto 
     {
@@ -42,6 +43,7 @@ namespace EEducationPlatform.CategoryAppServiceTests;
     public CategoryAppServiceTests()
     {
         _categoryAppService = GetRequiredService<ICategoryAppService>();
+        _categoryRepository = GetRequiredService<ICategoryRepository>();
     }
 
 }

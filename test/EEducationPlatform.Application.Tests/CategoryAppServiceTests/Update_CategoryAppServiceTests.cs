@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using EEducationPlatform.Categories;
 using EEducationPlatform.Categories.Dtos;
 using Shouldly;
 using Volo.Abp.Modularity;
@@ -8,8 +7,7 @@ using Xunit;
 
 namespace EEducationPlatform.CategoryAppServiceTests;
 
-public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducationPlatformApplicationTestBase<TStartupModule>
-    where TStartupModule : IAbpModule
+public abstract partial class CategoryAppServiceTests<TStartupModule> where TStartupModule : IAbpModule
 {
     [Fact]
     public async Task Update__Should_Update_Category()
@@ -28,7 +26,7 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
 
         //Assert
         categoryId.ShouldNotBe(Guid.Empty);
-        var createdCategory = await _categoryAppService.GetAsync(categoryId, new GetCategoryQueryDto { });
+        var createdCategory = await _categoryRepository.GetAsync(categoryId);
         createdCategory.Name.ShouldBe(updateCategoryDto.Name);
         createdCategory.Description.ShouldBe(updateCategoryDto.Description);
         createdCategory.Code.ShouldBe(_firstCreateCategoryDto.Code);
@@ -56,7 +54,7 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
 
         //Assert
         categoryId.ShouldNotBe(Guid.Empty);
-        var createdCategory = await _categoryAppService.GetAsync(categoryId, new GetCategoryQueryDto { });
+        var createdCategory = await _categoryRepository.GetAsync(categoryId);
         createdCategory.Name.ShouldBe(updateCategoryDto.Name);
         createdCategory.Description.ShouldBe(updateCategoryDto.Description);
         createdCategory.Code.ShouldBe(_firstCreateCategoryDto.Code);
@@ -64,7 +62,7 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
         createdCategory.HasSubCategories.ShouldBeFalse();
         createdCategory.SubCategories.ShouldBeEmpty();
         
-        var parentCategory = await _categoryAppService.GetAsync(parentCategoryId, new GetCategoryQueryDto { });
+        var parentCategory = await _categoryRepository.GetAsync(parentCategoryId);
         parentCategory.HasSubCategories.ShouldBeTrue();
         parentCategory.SubCategories.ShouldContain(x => x.Id == categoryId);
     }
@@ -90,7 +88,7 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
 
         //Assert
         categoryId.ShouldNotBe(Guid.Empty);
-        var createdCategory = await _categoryAppService.GetAsync(categoryId, new GetCategoryQueryDto { });
+        var createdCategory = await _categoryRepository.GetAsync(categoryId);
         createdCategory.Name.ShouldBe(updateCategoryDto.Name);
         createdCategory.Description.ShouldBe(updateCategoryDto.Description);
         createdCategory.Code.ShouldBe(_thirdCreateCategoryDto.Code);
@@ -98,11 +96,11 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
         createdCategory.HasSubCategories.ShouldBeFalse();
         createdCategory.SubCategories.ShouldBeEmpty();
         
-        var oldParentCategory = await _categoryAppService.GetAsync(oldParentCategoryId, new GetCategoryQueryDto { });
+        var oldParentCategory = await _categoryRepository.GetAsync(oldParentCategoryId);
         oldParentCategory.HasSubCategories.ShouldBeFalse();
         oldParentCategory.SubCategories.ShouldBeEmpty();
         
-        var newParentCategory = await _categoryAppService.GetAsync(newParentCategoryId, new GetCategoryQueryDto { });
+        var newParentCategory = await _categoryRepository.GetAsync(newParentCategoryId);
         newParentCategory.HasSubCategories.ShouldBeTrue();
         newParentCategory.SubCategories.ShouldContain(x => x.Id == categoryId);
     }
@@ -126,7 +124,7 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
 
         //Assert
         categoryId.ShouldNotBe(Guid.Empty);
-        var createdCategory = await _categoryAppService.GetAsync(categoryId, new GetCategoryQueryDto { });
+        var createdCategory = await _categoryRepository.GetAsync(categoryId);
         createdCategory.Name.ShouldBe(updateCategoryDto.Name);
         createdCategory.Description.ShouldBe(updateCategoryDto.Description);
         createdCategory.Code.ShouldBe(_thirdCreateCategoryDto.Code);
@@ -134,7 +132,7 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
         createdCategory.HasSubCategories.ShouldBeFalse();
         createdCategory.SubCategories.ShouldBeEmpty();
         
-        var oldParentCategory = await _categoryAppService.GetAsync(oldParentCategoryId, new GetCategoryQueryDto { });
+        var oldParentCategory = await _categoryRepository.GetAsync(oldParentCategoryId);
         oldParentCategory.HasSubCategories.ShouldBeFalse();
         oldParentCategory.SubCategories.ShouldBeEmpty();
     }

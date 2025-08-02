@@ -1,6 +1,6 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
-using EEducationPlatform.Categories.Dtos;
 using Shouldly;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Modularity;
@@ -8,8 +8,7 @@ using Xunit;
 
 namespace EEducationPlatform.CategoryAppServiceTests;
 
-public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducationPlatformApplicationTestBase<TStartupModule>
-    where TStartupModule : IAbpModule
+public abstract partial class CategoryAppServiceTests<TStartupModule> where TStartupModule : IAbpModule
 {
     [Fact]
     public async Task Create__Should_Create_Main_Category()
@@ -19,7 +18,7 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
 
         //Assert
         result.ShouldNotBe(Guid.Empty);
-        var createdCategory = await _categoryAppService.GetAsync(result, new GetCategoryQueryDto{});
+        var createdCategory = await _categoryRepository.GetAsync(result);
         createdCategory.Name.ShouldBe(_firstCreateCategoryDto.Name);
         createdCategory.Description.ShouldBe(_firstCreateCategoryDto.Description);
         createdCategory.Code.ShouldBe(_firstCreateCategoryDto.Code);
@@ -53,13 +52,13 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
         
         //Assert
         // parent category
-        var parentCategory = await _categoryAppService.GetAsync(parentCategoryId, new GetCategoryQueryDto{MaxDepth = 1});
+        var parentCategory = await _categoryRepository.GetAsync(parentCategoryId);
         parentCategory.Code.ShouldBe(_firstCreateCategoryDto.Code);
         parentCategory.HasSubCategories.ShouldBeTrue();
-        parentCategory.SubCategories.Count.ShouldBe(1);
-        parentCategory.SubCategories[0].Id.ShouldBe(subCategoryId);
+        parentCategory.SubCategories.Count().ShouldBe(1);
+        parentCategory.SubCategories.ToList()[0].Id.ShouldBe(subCategoryId);
         // subcategory
-        var subCategory = await _categoryAppService.GetAsync(subCategoryId, new GetCategoryQueryDto{});
+        var subCategory = await _categoryRepository.GetAsync(subCategoryId);
         subCategory.Code.ShouldBe(_secondCreateCategoryDto.Code);
         subCategory.ParentCategoryId.ShouldBe(parentCategoryId);
         subCategory.HasSubCategories.ShouldBeFalse();

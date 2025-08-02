@@ -1,6 +1,4 @@
-using System;
 using System.Threading.Tasks;
-using EEducationPlatform.Categories;
 using EEducationPlatform.Categories.Dtos;
 using Shouldly;
 using Volo.Abp.Modularity;
@@ -9,8 +7,7 @@ using Xunit;
 
 namespace EEducationPlatform.CategoryAppServiceTests;
 
-public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducationPlatformApplicationTestBase<TStartupModule>
-    where TStartupModule : IAbpModule
+public abstract partial class CategoryAppServiceTests<TStartupModule> where TStartupModule : IAbpModule
 {
     [Fact]
     public async Task Get__Should_Get_Category_With_Max_Depth_0()

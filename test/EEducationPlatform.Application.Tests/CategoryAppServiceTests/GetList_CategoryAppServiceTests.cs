@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using EEducationPlatform.Categories.Dtos;
 using Shouldly;
@@ -7,9 +6,7 @@ using Xunit;
 
 namespace EEducationPlatform.CategoryAppServiceTests;
 
-public abstract partial class
-    CategoryAppServiceTests<TStartupModule> : EEducationPlatformApplicationTestBase<TStartupModule>
-    where TStartupModule : IAbpModule
+public abstract partial class CategoryAppServiceTests<TStartupModule> where TStartupModule : IAbpModule
 {
     [Theory]
     [InlineData("Code")]

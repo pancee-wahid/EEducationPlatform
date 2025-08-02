@@ -17,6 +17,11 @@ public class CategoryRepository : EfCoreRepository<EEducationPlatformDbContext, 
     {
     }
 
+    public override async Task<IQueryable<Category>> WithDetailsAsync()
+    {
+        return (await base.WithDetailsAsync()).Include(c => c.SubCategories);
+    }
+
     public async Task<Category> GetCategoryDetailsAsync(Guid id, int maxDepth = 1)
     {
         var dbSet = await GetDbSetAsync();

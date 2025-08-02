@@ -1,5 +1,5 @@
+using System.Linq;
 using System.Threading.Tasks;
-using EEducationPlatform.Categories;
 using EEducationPlatform.Categories.Dtos;
 using Shouldly;
 using Volo.Abp;
@@ -9,8 +9,7 @@ using Xunit;
 
 namespace EEducationPlatform.CategoryAppServiceTests;
 
-public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducationPlatformApplicationTestBase<TStartupModule>
-    where TStartupModule : IAbpModule
+public abstract partial class CategoryAppServiceTests<TStartupModule> where TStartupModule : IAbpModule
 {
     [Fact]
     public async Task Delete__Should_Delete_Category_With_No_Subcategories()
@@ -44,10 +43,10 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
         await Assert.ThrowsAsync<EntityNotFoundException>(() => 
             _categoryAppService.DeleteAsync(firstSubCategoryId)
         );
-        var parentCategory = await _categoryAppService.GetAsync(parentCategoryId, new GetCategoryQueryDto { });
+        var parentCategory = await _categoryRepository.GetAsync(parentCategoryId);
         parentCategory.HasSubCategories.ShouldBeTrue();
-        parentCategory.SubCategories.Count.ShouldBe(1);
-        parentCategory.SubCategories[0].Id.ShouldBe(secondSubCategoryId);
+        parentCategory.SubCategories.Count().ShouldBe(1);
+        parentCategory.SubCategories.ToList()[0].Id.ShouldBe(secondSubCategoryId);
     }
     
     [Fact]
@@ -65,7 +64,7 @@ public abstract partial class CategoryAppServiceTests<TStartupModule> : EEducati
         await Assert.ThrowsAsync<EntityNotFoundException>(() => 
             _categoryAppService.DeleteAsync(firstSubCategoryId)
         );
-        var parentCategory = await _categoryAppService.GetAsync(parentCategoryId, new GetCategoryQueryDto { });
+        var parentCategory = await _categoryRepository.GetAsync(parentCategoryId);
         parentCategory.HasSubCategories.ShouldBeFalse();
         parentCategory.SubCategories.ShouldBeEmpty();
     }
